@@ -1,0 +1,103 @@
+/* ============================================
+   CROWD OPERATIONS DASHBOARD — Page-specific styles
+   ============================================ */
+
+.ops-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.ops-summary-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.ops-summary-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+  background: var(--status-color, var(--green));
+}
+.ops-summary-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.ops-summary-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.3rem; }
+.ops-summary-value { font-size: 1.6rem; font-weight: 800; }
+.ops-summary-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+.zone-select-row {
+  display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+}
+.zone-select-btn {
+  padding: 0.6rem 1.2rem; background: var(--glass); border: 1px solid var(--border);
+  border-radius: 50px; color: var(--text); font-size: 0.85rem; cursor: pointer;
+  transition: var(--transition); display: flex; align-items: center; gap: 0.5rem;
+}
+.zone-select-btn:hover { border-color: var(--gold); }
+.zone-select-btn.active { background: var(--crimson-glow); border-color: var(--crimson); color: var(--white); }
+
+.zone-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.zone-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+@media (max-width: 800px) { .zone-detail-grid { grid-template-columns: 1fr; } }
+
+.risk-panel {
+  background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.75rem;
+}
+.risk-score-ring-wrap { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.25rem; }
+.risk-score-num { font-size: 2.8rem; font-weight: 800; line-height: 1; }
+.risk-level-badge {
+  display: inline-block; padding: 0.3rem 0.9rem; border-radius: 50px;
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  margin-top: 0.4rem;
+}
+.risk-level-badge.normal   { background: rgba(34,197,94,0.15); color: var(--green); }
+.risk-level-badge.watch    { background: var(--gold-soft); color: var(--gold); }
+.risk-level-badge.alert    { background: rgba(249,115,22,0.15); color: #fb923c; }
+.risk-level-badge.critical { background: rgba(217,44,71,0.2); color: var(--crimson-bright); animation: glowPulse 1.5s infinite; }
+
+.risk-metrics { display: flex; flex-direction: column; gap: 0.75rem; }
+.risk-metric-row { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+.risk-metric-row:last-child { border-bottom: none; }
+.risk-metric-label { color: var(--text-muted); }
+.risk-metric-value { font-weight: 700; }
+
+.gate-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.gate-row {
+  display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1rem;
+  background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+.gate-icon { font-size: 1.3rem; }
+.gate-info { flex: 1; }
+.gate-name { font-size: 0.88rem; font-weight: 600; }
+.gate-wait { font-size: 0.78rem; color: var(--text-muted); }
+.gate-badge {
+  font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px;
+  text-transform: uppercase;
+}
+.gate-badge.ok   { background: rgba(34,197,94,0.15); color: var(--green); }
+.gate-badge.busy { background: var(--gold-soft); color: var(--gold); }
+.gate-badge.over { background: rgba(217,44,71,0.2); color: var(--crimson-bright); }
+
+.controls-panel {
+  background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;
+}
+.slider-group label { font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; }
+.slider-group input[type="range"] { width: 100%; accent-color: var(--crimson); }
+.slider-value { font-weight: 700; color: var(--gold); }
+
+.ai-recommendation {
+  background: linear-gradient(135deg, var(--crimson-glow), transparent);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem;
+  margin-top: 1rem;
+}
+.ai-recommendation-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; font-weight: 700; }

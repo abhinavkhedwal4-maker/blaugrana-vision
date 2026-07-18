@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#a31d31"/>
+  <meta name="color-scheme" content="dark"/>
+  <link rel="icon" href="data:,">
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Blaugrana Vision — Smart Stadiums & Tournament Operations"/>
+  <meta property="og:description" content="GenAI-enabled navigation, crowd management, accessibility, transport and sustainability platform for the FIFA World Cup 2026."/>
+  <meta name="description" content="Blaugrana Vision — Smart Stadium & Tournament Operations for FIFA World Cup 2026"/>
+  <title>Blaugrana Vision — FIFA World Cup 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="index.html" aria-label="Blaugrana Vision home">
+      <span class="logo-icon" aria-hidden="true">⚽</span>
+      <span class="logo-text">Blaugrana Vision</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="index.html" class="active" role="menuitem">Home</a></li>
+      <li role="none"><a href="pages/stadium-explorer.html" role="menuitem">3D Stadiums</a></li>
+      <li role="none"><a href="pages/navigator.html" role="menuitem">Navigator</a></li>
+      <li role="none"><a href="pages/crowd-ops.html" role="menuitem">Crowd Ops</a></li>
+      <li role="none"><a href="pages/transport.html" role="menuitem">Transport</a></li>
+      <li role="none"><a href="pages/accessibility.html" role="menuitem">Accessibility</a></li>
+      <li role="none"><a href="pages/sustainability.html" role="menuitem">Sustainability</a></li>
+      <li role="none"><a href="pages/operations.html" role="menuitem">Operations</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="chat-toggle-btn" type="button" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+        <span aria-hidden="true">🤖</span> Ask Blaugrana AI
+      </button>
+      <button class="login-btn" id="loginBtn" aria-label="Sign in with Google">Sign In</button>
+      <div class="user-info hidden" id="userInfo">
+        <img src="" alt="Profile picture" class="user-avatar" id="userAvatar"/>
+        <span id="userName"></span>
+        <button type="button" onclick="handleLogout()" aria-label="Sign out">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero" id="main-content" aria-labelledby="heroTitle">
+    <div class="hero-badge" role="status">🌍 GenAI-Powered Tournament Operations</div>
+    <h1 class="hero-title" id="heroTitle">
+      <span class="title-line">Every Stadium.</span>
+      <span class="title-line accent">Every Fan.</span>
+      <span class="title-line">One Intelligent Platform.</span>
+    </h1>
+    <p class="hero-subtitle">
+      Blaugrana Vision brings real-time AI intelligence to navigation, crowd safety, accessibility, transport and sustainability across all 16 FIFA World Cup 2026 venues.
+    </p>
+    <div class="hero-cta">
+      <a href="pages/stadium-explorer.html" class="btn btn-primary" aria-label="Explore stadiums in 3D">Explore Stadiums in 3D</a>
+      <a href="pages/crowd-ops.html" class="btn btn-ghost" aria-label="Open crowd operations dashboard">Crowd Ops Dashboard →</a>
+    </div>
+    <div class="hero-stats" role="region" aria-label="Tournament statistics">
+      <div class="stat"><span class="stat-num">16</span><span class="stat-label">Host Stadiums</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">Host Nations</span></div>
+      <div class="stat"><span class="stat-num">AI</span><span class="stat-label">Powered</span></div>
+    </div>
+  </section>
+
+  <section class="features" aria-labelledby="featuresTitle">
+    <div class="section-label">Platform Modules</div>
+    <h2 class="section-title" id="featuresTitle">Built for Every Stakeholder</h2>
+    <div class="cards-grid">
+      <a href="pages/stadium-explorer.html" class="feature-card" data-color="green" aria-label="3D Stadium Explorer">
+        <div class="card-icon" aria-hidden="true">🏟️</div>
+        <h3>3D Stadium Explorer</h3>
+        <p>Interactive virtual tours of all 16 venues with tier-by-tier detail and live occupancy overlays.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/navigator.html" class="feature-card" data-color="blue" aria-label="AI Navigator">
+        <div class="card-icon" aria-hidden="true">🧭</div>
+        <h3>AI Navigator</h3>
+        <p>Multilingual wayfinding to seats, gates, concessions and accessible routes.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/crowd-ops.html" class="feature-card" data-color="purple" aria-label="Crowd Operations">
+        <div class="card-icon" aria-hidden="true">👥</div>
+        <h3>Crowd Operations</h3>
+        <p>Live density, gate congestion and evacuation-time modelling for venue staff.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/transport.html" class="feature-card" data-color="orange" aria-label="Transport Intelligence">
+        <div class="card-icon" aria-hidden="true">🚆</div>
+        <h3>Transport Intelligence</h3>
+        <p>Real-time transit recommendations and departure planning around match schedules.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/accessibility.html" class="feature-card" data-color="green" aria-label="Accessibility Services">
+        <div class="card-icon" aria-hidden="true">♿</div>
+        <h3>Accessibility Services</h3>
+        <p>Wheelchair routing, sensory-friendly zones and assistance requests in one tap.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/sustainability.html" class="feature-card" data-color="blue" aria-label="Sustainability Tracker">
+        <div class="card-icon" aria-hidden="true">🌱</div>
+        <h3>Sustainability Tracker</h3>
+        <p>Venue-by-venue emissions insight and fan-facing green travel guidance.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+      <a href="pages/operations.html" class="feature-card" data-color="purple" aria-label="Operations Command Centre">
+        <div class="card-icon" aria-hidden="true">📡</div>
+        <h3>Operations Command Centre</h3>
+        <p>Unified real-time intelligence feed for organisers and volunteers across all venues.</p>
+        <span class="card-arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="carbon-meter-section" aria-labelledby="statsTitle">
+    <div class="section-label">Tournament at a Glance</div>
+    <h2 class="section-title" id="statsTitle">16 Venues. Three Nations.</h2>
+    <div class="meter-grid" id="venueStatsGrid">
+      <!-- Populated by main.js from stadiums-data.js -->
+    </div>
+  </section>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat Assistant">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">⚽</div>
+        <div>
+          <div class="chat-name">Blaugrana AI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" type="button" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Chat messages">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">⚽</div>
+        <div class="bubble-content">
+          <p>Hi! I'm <strong>Blaugrana AI</strong> — ask me about any of the 16 World Cup 2026 stadiums, wayfinding, transport, or accessibility.</p>
+        </div>
+      </div>
+      <div class="chat-suggestions" role="group" aria-label="Suggested questions">
+        <button type="button" onclick="sendSuggestion('Which stadium hosts the World Cup Final?')">Where is the Final?</button>
+        <button type="button" onclick="sendSuggestion('How do I request wheelchair assistance?')">Wheelchair assistance</button>
+        <button type="button" onclick="sendSuggestion('What is the greenest way to reach the stadium?')">Green travel tips</button>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask about stadiums, routes, accessibility..." rows="1"
+          onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message input"></textarea>
+        <button class="send-btn" type="button" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span aria-hidden="true">⚽</span>
+        <span class="logo-text">Blaugrana Vision</span>
+        <p>Smart Stadiums & Tournament Operations for FIFA World Cup 2026.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="pages/stadium-explorer.html">3D Stadiums</a>
+        <a href="pages/navigator.html">Navigator</a>
+        <a href="pages/crowd-ops.html">Crowd Ops</a>
+        <a href="pages/operations.html">Operations</a>
+      </nav>
+      <div class="footer-note">Challenge 4 — Smart Stadiums & Tournament Operations</div>
+    </div>
+  </footer>
+
+  <script type="module" src="main.js"></script>
+  <script type="module" src="js/chatbot.js"></script>
+</body>
+</html>

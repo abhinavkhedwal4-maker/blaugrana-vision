@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#a31d31"/>
+  <meta name="color-scheme" content="dark"/>
+  <link rel="icon" href="data:,">
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Blaugrana Vision — Crowd Operations"/>
+  <meta property="og:description" content="Live crowd density, gate congestion and evacuation-time modelling for FIFA World Cup 2026 venues."/>
+  <meta name="description" content="Real-time crowd safety intelligence dashboard for stadium operators"/>
+  <title>Crowd Operations — Blaugrana Vision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/crowd-ops.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="../index.html" aria-label="Blaugrana Vision home">
+      <span class="logo-icon" aria-hidden="true">⚽</span>
+      <span class="logo-text">Blaugrana Vision</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
+      <li role="none"><a href="stadium-explorer.html" role="menuitem">3D Stadiums</a></li>
+      <li role="none"><a href="navigator.html" role="menuitem">Navigator</a></li>
+      <li role="none"><a href="crowd-ops.html" class="active" role="menuitem">Crowd Ops</a></li>
+      <li role="none"><a href="transport.html" role="menuitem">Transport</a></li>
+      <li role="none"><a href="accessibility.html" role="menuitem">Accessibility</a></li>
+      <li role="none"><a href="sustainability.html" role="menuitem">Sustainability</a></li>
+      <li role="none"><a href="operations.html" role="menuitem">Operations</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="chat-toggle-btn" type="button" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+        <span aria-hidden="true">🤖</span> Ask Blaugrana AI
+      </button>
+      <button class="login-btn" id="loginBtn" aria-label="Sign in with Google">Sign In</button>
+      <div class="user-info hidden" id="userInfo">
+        <img src="" alt="Profile picture" class="user-avatar" id="userAvatar"/>
+        <span id="userName"></span>
+        <button type="button" onclick="handleLogout()" aria-label="Sign out">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">For Venue Staff & Organisers</div>
+    <h1>Crowd <span style="color:var(--gold)">Operations</span></h1>
+    <p>Live density, gate congestion and evacuation-time intelligence — grounded in Fruin Level-of-Service and NFPA 101 safety standards.</p>
+  </div>
+
+  <div class="page-content">
+    <div class="ops-grid" id="opsSummaryGrid" role="region" aria-label="Venue-wide summary"></div>
+
+    <div class="zone-select-row" id="zoneSelectRow" role="group" aria-label="Select a stadium zone"></div>
+
+    <div class="zone-detail-grid">
+      <div class="risk-panel" role="region" aria-labelledby="riskPanelTitle">
+        <h2 id="riskPanelTitle" style="margin-bottom:1rem;">Zone Risk Assessment</h2>
+        <div class="risk-score-ring-wrap">
+          <div>
+            <div class="risk-score-num" id="riskScoreNum" aria-live="polite">0</div>
+            <div class="risk-level-badge normal" id="riskLevelBadge">Normal</div>
+          </div>
+        </div>
+        <div class="risk-metrics" id="riskMetrics"></div>
+      </div>
+
+      <div class="controls-panel" role="region" aria-labelledby="controlsPanelTitle">
+        <h2 id="controlsPanelTitle" style="margin-bottom:0.5rem;">Simulate Conditions</h2>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">Adjust to model different crowd scenarios for this zone.</p>
+
+        <div class="slider-group">
+          <label for="occupantsSlider">Occupants: <span class="slider-value" id="occupantsValue">8,000</span></label>
+          <input type="range" id="occupantsSlider" min="0" max="25000" step="250" value="8000" aria-label="Zone occupants"/>
+        </div>
+        <div class="slider-group">
+          <label for="arrivalsSlider">Arrivals per minute: <span class="slider-value" id="arrivalsValue">120</span></label>
+          <input type="range" id="arrivalsSlider" min="0" max="400" step="10" value="120" aria-label="Arrivals per minute"/>
+        </div>
+
+        <button class="btn btn-primary" type="button" onclick="requestAIRecommendation()" style="margin-top:0.5rem;" aria-label="Get AI recommendation">
+          🤖 Get AI Recommendation
+        </button>
+      </div>
+    </div>
+
+    <h2 style="margin-bottom:1rem;">Gate Status</h2>
+    <div class="gate-list" id="gateList" role="list" aria-label="Gate congestion status"></div>
+
+    <div class="ai-recommendation hidden" id="aiRecommendation" aria-live="polite">
+      <div class="ai-recommendation-header"><span aria-hidden="true">🤖</span> Blaugrana AI Recommendation</div>
+      <div id="aiRecommendationContent"></div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">⚽</div>
+        <div>
+          <div class="chat-name">Blaugrana AI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" type="button" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">⚽</div>
+        <div class="bubble-content"><p>Ask me about crowd safety protocols, gate management, or evacuation planning!</p></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask about crowd operations..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <button class="send-btn" type="button" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/crowd-ops.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/page-auth.js"></script>
+</body>
+</html>

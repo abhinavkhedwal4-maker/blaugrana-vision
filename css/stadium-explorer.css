@@ -1,0 +1,102 @@
+/* ============================================
+   STADIUM EXPLORER — Page-specific styles
+   ============================================ */
+
+.explorer-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .explorer-layout { grid-template-columns: 1fr; }
+}
+
+/* ---- STADIUM LIST SIDEBAR ---- */
+.stadium-list {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  max-height: 640px;
+  overflow-y: auto;
+}
+.stadium-list::-webkit-scrollbar { width: 4px; }
+.stadium-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.stadium-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid transparent;
+  margin-bottom: 0.4rem;
+}
+.stadium-list-item:hover { background: rgba(255,255,255,0.04); }
+.stadium-list-item.selected {
+  background: var(--crimson-glow);
+  border-color: var(--crimson);
+}
+
+.stadium-list-flag { font-size: 1.3rem; flex-shrink: 0; }
+.stadium-list-info { flex: 1; min-width: 0; }
+.stadium-list-name {
+  font-size: 0.88rem; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.stadium-list-city { font-size: 0.75rem; color: var(--text-muted); }
+.stadium-list-tier {
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+  padding: 0.15rem 0.5rem; border-radius: 20px; letter-spacing: 0.05em; flex-shrink: 0;
+}
+.stadium-list-tier.final      { background: var(--gold-soft); color: var(--gold); }
+.stadium-list-tier.semifinal  { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.stadium-list-tier.group      { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+
+/* ---- MAIN VIEWER ---- */
+.viewer-panel { display: flex; flex-direction: column; gap: 1rem; }
+
+.viewer-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  flex-wrap: wrap; gap: 1rem;
+}
+.viewer-title h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.25rem; }
+.viewer-title p { color: var(--text-muted); font-size: 0.9rem; }
+
+.viewer-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.viewer-control-btn {
+  padding: 0.5rem 1rem; background: var(--glass); border: 1px solid var(--border);
+  border-radius: 50px; color: var(--text); font-size: 0.8rem; cursor: pointer;
+  transition: var(--transition); display: flex; align-items: center; gap: 0.4rem;
+}
+.viewer-control-btn:hover { border-color: var(--gold); color: var(--gold); }
+.viewer-control-btn.active { background: var(--crimson-glow); border-color: var(--crimson); color: var(--white); }
+
+.stadium-3d-loading p { color: var(--text-muted); font-size: 0.9rem; }
+
+.viewer-hint {
+  font-size: 0.78rem; color: var(--text-muted); text-align: center;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ---- STADIUM FACTS ---- */
+.stadium-facts {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 1rem;
+}
+.fact-card {
+  background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 1rem;
+}
+.fact-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.4rem; }
+.fact-value { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+
+.stadium-highlight {
+  background: linear-gradient(135deg, var(--crimson-glow), transparent);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.25rem 1.5rem; font-size: 0.95rem; line-height: 1.6;
+}
+.stadium-highlight strong { color: var(--gold); }

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#a31d31"/>
+  <meta name="color-scheme" content="dark"/>
+  <link rel="icon" href="data:,">
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Blaugrana Vision — Operations Command Centre"/>
+  <meta property="og:description" content="Real-time venue status, incident logging and AI briefings for FIFA World Cup 2026 organisers."/>
+  <meta name="description" content="Operations command centre for FIFA World Cup 2026 organisers and volunteers"/>
+  <title>Operations — Blaugrana Vision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/operations.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="../index.html" aria-label="Blaugrana Vision home">
+      <span class="logo-icon" aria-hidden="true">⚽</span>
+      <span class="logo-text">Blaugrana Vision</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
+      <li role="none"><a href="stadium-explorer.html" role="menuitem">3D Stadiums</a></li>
+      <li role="none"><a href="navigator.html" role="menuitem">Navigator</a></li>
+      <li role="none"><a href="crowd-ops.html" role="menuitem">Crowd Ops</a></li>
+      <li role="none"><a href="transport.html" role="menuitem">Transport</a></li>
+      <li role="none"><a href="accessibility.html" role="menuitem">Accessibility</a></li>
+      <li role="none"><a href="sustainability.html" role="menuitem">Sustainability</a></li>
+      <li role="none"><a href="operations.html" class="active" role="menuitem">Operations</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="chat-toggle-btn" type="button" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+        <span aria-hidden="true">🤖</span> Ask Blaugrana AI
+      </button>
+      <button class="login-btn" id="loginBtn" aria-label="Sign in with Google">Sign In</button>
+      <div class="user-info hidden" id="userInfo">
+        <img src="" alt="Profile picture" class="user-avatar" id="userAvatar"/>
+        <span id="userName"></span>
+        <button type="button" onclick="handleLogout()" aria-label="Sign out">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">For Organisers & Volunteers</div>
+    <h1>Operations <span style="color:var(--gold)">Command Centre</span></h1>
+    <p>Unified real-time intelligence across all 16 venues — status, incidents, and AI-generated briefings in one place.</p>
+  </div>
+
+  <div class="page-content">
+    <div class="ops-stats-grid" id="opsCommandSummary" style="margin-bottom:2rem;"></div>
+
+    <div class="ops-command-grid">
+      <div>
+        <h2 style="margin-bottom:1rem;">Venue Status — All 16 Stadiums</h2>
+        <div class="venue-status-table" id="venueStatusTable" role="table" aria-label="Venue status table"></div>
+      </div>
+
+      <div class="incident-panel">
+        <h2 style="margin-bottom:1rem;">Log an Incident</h2>
+        <form class="incident-form" id="incidentForm" aria-label="Incident logging form">
+          <div class="form-group">
+            <label for="incidentStadium" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">Venue</label>
+            <select id="incidentStadium" required style="width:100%;padding:0.6rem 0.9rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);"></select>
+          </div>
+          <div class="form-group">
+            <label for="incidentDetails" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">Details</label>
+            <textarea id="incidentDetails" required maxlength="300" placeholder="e.g. Gate C queue exceeding 15 min wait" style="width:100%;padding:0.6rem 0.9rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical;min-height:70px;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Log Incident</button>
+        </form>
+        <div class="incident-log" id="incidentLog" role="log" aria-live="polite" aria-label="Recent incidents"></div>
+      </div>
+    </div>
+
+    <div class="briefing-panel">
+      <h2 style="margin-bottom:1rem;">🤖 AI Operations Briefing</h2>
+      <button class="btn btn-primary" type="button" onclick="requestBriefing()" style="margin-bottom:1rem;">Generate Briefing</button>
+      <div id="briefingContent"><p style="color:var(--text-muted)">Click "Generate Briefing" for an AI-authored summary of current tournament-wide status.</p></div>
+    </div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">⚽</div>
+        <div>
+          <div class="chat-name">Blaugrana AI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" type="button" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">⚽</div>
+        <div class="bubble-content"><p>Ask me about protocols, staffing guidance, or venue-specific operations!</p></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask about operations..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <button class="send-btn" type="button" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/operations.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/page-auth.js"></script>
+</body>
+</html>

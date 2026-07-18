@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#a31d31"/>
+  <meta name="color-scheme" content="dark"/>
+  <link rel="icon" href="data:,">
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Blaugrana Vision — Transport Intelligence"/>
+  <meta property="og:description" content="Plan your journey to any FIFA World Cup 2026 stadium with real-time transport intelligence."/>
+  <meta name="description" content="Transport planning and real-time transit status for FIFA World Cup 2026"/>
+  <title>Transport — Blaugrana Vision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/transport.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="../index.html" aria-label="Blaugrana Vision home">
+      <span class="logo-icon" aria-hidden="true">⚽</span>
+      <span class="logo-text">Blaugrana Vision</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
+      <li role="none"><a href="stadium-explorer.html" role="menuitem">3D Stadiums</a></li>
+      <li role="none"><a href="navigator.html" role="menuitem">Navigator</a></li>
+      <li role="none"><a href="crowd-ops.html" role="menuitem">Crowd Ops</a></li>
+      <li role="none"><a href="transport.html" class="active" role="menuitem">Transport</a></li>
+      <li role="none"><a href="accessibility.html" role="menuitem">Accessibility</a></li>
+      <li role="none"><a href="sustainability.html" role="menuitem">Sustainability</a></li>
+      <li role="none"><a href="operations.html" role="menuitem">Operations</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="chat-toggle-btn" type="button" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+        <span aria-hidden="true">🤖</span> Ask Blaugrana AI
+      </button>
+      <button class="login-btn" id="loginBtn" aria-label="Sign in with Google">Sign In</button>
+      <div class="user-info hidden" id="userInfo">
+        <img src="" alt="Profile picture" class="user-avatar" id="userAvatar"/>
+        <span id="userName"></span>
+        <button type="button" onclick="handleLogout()" aria-label="Sign out">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Plan Your Journey</div>
+    <h1>Transport <span style="color:var(--gold)">Intelligence</span></h1>
+    <p>Compare travel modes, get your ideal departure time, and check live transit status — all matched to kickoff.</p>
+  </div>
+
+  <div class="page-content">
+    <select class="nav-select" id="transportStadiumSelect" aria-label="Select stadium" style="margin-bottom:1.5rem;max-width:400px;padding:0.75rem 1rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);"></select>
+
+    <h2 style="margin-bottom:1rem;">Compare Travel Modes</h2>
+    <div class="transport-modes" id="modeGrid" role="radiogroup" aria-label="Travel mode options"></div>
+
+    <div class="departure-planner">
+      <h2 style="margin-bottom:1rem;">Departure Planner</h2>
+      <div class="form-group" style="max-width:260px;">
+        <label for="kickoffTime" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">Kickoff time</label>
+        <input type="time" id="kickoffTime" value="19:00" style="width:100%;padding:0.75rem 1rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;"/>
+      </div>
+      <div class="departure-result hidden" id="departureResult"></div>
+    </div>
+
+    <h2 style="margin-bottom:1rem;">Live Transit Status</h2>
+    <div class="transit-line-list" id="transitLineList" role="list" aria-label="Transit line status"></div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">⚽</div>
+        <div>
+          <div class="chat-name">Blaugrana AI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" type="button" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">⚽</div>
+        <div class="bubble-content"><p>Ask me about parking, shuttle schedules, or the fastest way to reach your seat!</p></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask about transport..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <button class="send-btn" type="button" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/transport.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/page-auth.js"></script>
+</body>
+</html>

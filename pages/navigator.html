@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#a31d31"/>
+  <meta name="color-scheme" content="dark"/>
+  <link rel="icon" href="data:,">
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Blaugrana Vision — AI Navigator"/>
+  <meta property="og:description" content="Multilingual AI wayfinding across all FIFA World Cup 2026 stadiums."/>
+  <meta name="description" content="Find seats, gates and amenities with multilingual AI wayfinding"/>
+  <title>AI Navigator — Blaugrana Vision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/navigator.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="../index.html" aria-label="Blaugrana Vision home">
+      <span class="logo-icon" aria-hidden="true">⚽</span>
+      <span class="logo-text">Blaugrana Vision</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
+      <li role="none"><a href="stadium-explorer.html" role="menuitem">3D Stadiums</a></li>
+      <li role="none"><a href="navigator.html" class="active" role="menuitem">Navigator</a></li>
+      <li role="none"><a href="crowd-ops.html" role="menuitem">Crowd Ops</a></li>
+      <li role="none"><a href="transport.html" role="menuitem">Transport</a></li>
+      <li role="none"><a href="accessibility.html" role="menuitem">Accessibility</a></li>
+      <li role="none"><a href="sustainability.html" role="menuitem">Sustainability</a></li>
+      <li role="none"><a href="operations.html" role="menuitem">Operations</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="chat-toggle-btn" type="button" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+        <span aria-hidden="true">🤖</span> Ask Blaugrana AI
+      </button>
+      <button class="login-btn" id="loginBtn" aria-label="Sign in with Google">Sign In</button>
+      <div class="user-info hidden" id="userInfo">
+        <img src="" alt="Profile picture" class="user-avatar" id="userAvatar"/>
+        <span id="userName"></span>
+        <button type="button" onclick="handleLogout()" aria-label="Sign out">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">Multilingual Wayfinding</div>
+    <h1>Never Get <span style="color:var(--gold)">Lost</span> Again</h1>
+    <p>Find your seat, gate, or nearest amenity in seconds — ask in any language.</p>
+  </div>
+
+  <div class="page-content">
+    <div class="nav-search-panel">
+      <div class="nav-search-row">
+        <select class="nav-select" id="stadiumSelect" aria-label="Select stadium"></select>
+        <input type="text" class="nav-input" id="navSearchInput" placeholder="e.g. 'Where is the nearest halal food stand?'" aria-label="Ask a wayfinding question"/>
+        <button class="btn btn-primary" id="navSearchBtn" aria-label="Ask Blaugrana AI">Ask AI</button>
+      </div>
+      <p id="langHint" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.6rem;">Ask Blaugrana AI anything — responses default to English.</p>
+      <div class="lang-pills" id="langPillRow" role="group" aria-label="Select response language"></div>
+    </div>
+
+    <h2 style="margin-bottom:1rem;">Quick Destinations</h2>
+    <div class="poi-grid" id="poiGrid" role="list" aria-label="Points of interest"></div>
+
+    <div class="route-result hidden" id="routeResult" aria-live="polite"></div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">⚽</div>
+        <div>
+          <div class="chat-name">Blaugrana AI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" type="button" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">⚽</div>
+        <div class="bubble-content"><p>Ask me for directions in any language — I'll guide you there!</p></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask for directions..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <button class="send-btn" type="button" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/navigator.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/page-auth.js"></script>
+</body>
+</html>

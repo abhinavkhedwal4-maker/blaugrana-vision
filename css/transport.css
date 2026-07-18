@@ -1,0 +1,51 @@
+/* ============================================
+   TRANSPORT INTELLIGENCE — Page-specific styles
+   ============================================ */
+
+.transport-modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.mode-card {
+  background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.5rem; text-align: center; cursor: pointer; transition: var(--transition);
+}
+.mode-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+.mode-card.selected { border-color: var(--crimson); background: var(--crimson-glow); }
+.mode-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+.mode-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; }
+.mode-eta { font-size: 0.8rem; color: var(--gold); font-family: 'Space Mono', monospace; }
+.mode-co2 { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+.departure-planner {
+  background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.75rem; margin-bottom: 2rem;
+}
+.departure-result {
+  display: flex; align-items: center; gap: 1.5rem; padding: 1.25rem;
+  background: linear-gradient(135deg, var(--gold-soft), transparent);
+  border: 1px solid rgba(245,183,0,0.3); border-radius: var(--radius); margin-top: 1rem;
+}
+.departure-time { font-size: 2.2rem; font-weight: 800; color: var(--gold); }
+.departure-label { font-size: 0.85rem; color: var(--text-muted); }
+
+.transit-line-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.transit-line-row {
+  display: flex; align-items: center; gap: 1rem; padding: 1rem;
+  background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+.transit-line-badge {
+  width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0; color: var(--white);
+}
+.transit-line-info { flex: 1; }
+.transit-line-name { font-weight: 700; font-size: 0.9rem; }
+.transit-line-detail { font-size: 0.78rem; color: var(--text-muted); }
+.transit-status {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 0.25rem 0.7rem; border-radius: 20px;
+}
+.transit-status.normal { background: rgba(34,197,94,0.15); color: var(--green); }
+.transit-status.delayed { background: var(--gold-soft); color: var(--gold); }
+.transit-status.crowded { background: rgba(217,44,71,0.2); color: var(--crimson-bright); }

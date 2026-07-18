@@ -1,0 +1,33 @@
+{
+  "name": "blaugrana-vision",
+  "version": "1.0.0",
+  "description": "GenAI-enabled Smart Stadium & Tournament Operations platform for the FIFA World Cup 2026 — navigation, crowd management, accessibility, transportation, sustainability, multilingual assistance and real-time operational intelligence.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/app.test.js",
+    "lint": "eslint js/ api/ server.js --ext .js",
+    "lint:fix": "eslint js/ api/ server.js --ext .js --fix"
+  },
+  "keywords": [
+    "fifa-world-cup-2026",
+    "smart-stadium",
+    "genai",
+    "crowd-management",
+    "accessibility",
+    "sustainability",
+    "groq",
+    "firebase",
+    "three.js"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}

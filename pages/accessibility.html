@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#a31d31"/>
+  <meta name="color-scheme" content="dark"/>
+  <link rel="icon" href="data:,">
+  <meta name="robots" content="index, follow"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Blaugrana Vision — Accessibility Services"/>
+  <meta property="og:description" content="Wheelchair routing, sensory-friendly zones and assistance requests for FIFA World Cup 2026 fans."/>
+  <meta name="description" content="Accessibility services and wheelchair routing for FIFA World Cup 2026"/>
+  <title>Accessibility — Blaugrana Vision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="../css/accessibility.css"/>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <a class="nav-logo" href="../index.html" aria-label="Blaugrana Vision home">
+      <span class="logo-icon" aria-hidden="true">⚽</span>
+      <span class="logo-text">Blaugrana Vision</span>
+    </a>
+    <ul class="nav-links" role="menubar">
+      <li role="none"><a href="../index.html" role="menuitem">Home</a></li>
+      <li role="none"><a href="stadium-explorer.html" role="menuitem">3D Stadiums</a></li>
+      <li role="none"><a href="navigator.html" role="menuitem">Navigator</a></li>
+      <li role="none"><a href="crowd-ops.html" role="menuitem">Crowd Ops</a></li>
+      <li role="none"><a href="transport.html" role="menuitem">Transport</a></li>
+      <li role="none"><a href="accessibility.html" class="active" role="menuitem">Accessibility</a></li>
+      <li role="none"><a href="sustainability.html" role="menuitem">Sustainability</a></li>
+      <li role="none"><a href="operations.html" role="menuitem">Operations</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="chat-toggle-btn" type="button" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
+        <span aria-hidden="true">🤖</span> Ask Blaugrana AI
+      </button>
+      <button class="login-btn" id="loginBtn" aria-label="Sign in with Google">Sign In</button>
+      <div class="user-info hidden" id="userInfo">
+        <img src="" alt="Profile picture" class="user-avatar" id="userAvatar"/>
+        <span id="userName"></span>
+        <button type="button" onclick="handleLogout()" aria-label="Sign out">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-hero" id="main-content">
+    <div class="section-label">For Every Fan</div>
+    <h1>Accessibility <span style="color:var(--gold)">Services</span></h1>
+    <p>Wheelchair routing, sensory-friendly zones, and one-tap assistance requests — designed for every fan to enjoy the tournament comfortably.</p>
+  </div>
+
+  <div class="page-content">
+    <h2 style="margin-bottom:1rem;">Select the Services You Need</h2>
+    <div class="access-options-grid" id="accessOptionsGrid" role="group" aria-label="Accessibility service options"></div>
+
+    <h2 style="margin-bottom:1rem;">Accessible Amenities by Venue</h2>
+    <select class="nav-select" id="accessStadiumSelect" aria-label="Select stadium" style="margin-bottom:1.5rem;max-width:400px;padding:0.75rem 1rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);"></select>
+    <div class="amenity-list" id="amenityList" role="list" aria-label="Accessible amenities" style="margin-bottom:3rem;"></div>
+
+    <h2 style="margin-bottom:1rem;">Request Assistance</h2>
+    <form class="assist-form" id="assistForm" aria-label="Assistance request form">
+      <div class="form-group">
+        <label for="assistStadium">Stadium</label>
+        <select id="assistStadium" required></select>
+      </div>
+      <div class="form-group">
+        <label for="assistDetails">Additional details (optional)</label>
+        <textarea id="assistDetails" placeholder="e.g. Arriving via Gate C at 6:30 PM, travelling with a companion" maxlength="500"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" aria-label="Submit assistance request">Submit Request</button>
+    </form>
+
+    <div class="confirmation-toast hidden" id="confirmationToast" aria-live="polite"></div>
+  </div>
+
+  <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
+  <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar" aria-hidden="true">⚽</div>
+        <div>
+          <div class="chat-name">Blaugrana AI</div>
+          <div class="chat-status"><span class="status-dot" aria-hidden="true"></span> Powered by Groq</div>
+        </div>
+      </div>
+      <button class="chat-close" type="button" onclick="toggleChat()" aria-label="Close chat">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="chat-bubble ai">
+        <div class="bubble-avatar" aria-hidden="true">⚽</div>
+        <div class="bubble-content"><p>Ask me about accessible routes, equipment loans, or sensory-friendly spaces!</p></div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-input-wrapper">
+        <label for="chatInput" class="sr-only">Type your message</label>
+        <textarea id="chatInput" placeholder="Ask about accessibility..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)" aria-label="Chat message"></textarea>
+        <button class="send-btn" type="button" onclick="sendMessage()" id="sendBtn" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-footer-note">Powered by Groq</div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/shared.js"></script>
+  <script type="module" src="../js/accessibility.js"></script>
+  <script type="module" src="../js/chatbot.js"></script>
+  <script type="module" src="../js/page-auth.js"></script>
+</body>
+</html>
