@@ -117,8 +117,8 @@ function buildScene(stadium) {
   const wrap = document.getElementById('stadium3dWrap');
   if (!wrap) return;
 
-  if (renderLoopHandle) cancelAnimationFrame(renderLoopHandle);
-  if (activeScene) activeScene.dispose();
+  if (renderLoopHandle) { cancelAnimationFrame(renderLoopHandle); renderLoopHandle = null; }
+  if (activeScene) { activeScene.dispose(); activeScene = null; }
 
   wrap.innerHTML = `
     <div class="stadium-3d-loading" id="viewerLoading">
@@ -128,10 +128,16 @@ function buildScene(stadium) {
 
   // Defer scene creation one frame so the loading state paints first.
   requestAnimationFrame(() => {
-    wrap.innerHTML = '';
-    activeScene = createStadiumScene(wrap, stadium);
-    startRenderLoop();
-    wireTierButtons();
+    try {
+      wrap.innerHTML = '';
+      activeScene = createStadiumScene(wrap, stadium);
+      startRenderLoop();
+      wireTierButtons();
+    } catch (err) {
+      wrap.innerHTML = `<p style="color:var(--text-muted,#888);padding:2rem;text-align:center">
+        ⚠️ 3D viewer could not start: ${err.message}</p>`;
+      console.error('[Stadium 3D] Scene build failed:', err.message);
+    }
   });
 }
 

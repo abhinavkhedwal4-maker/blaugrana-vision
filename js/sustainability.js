@@ -71,9 +71,9 @@ function calculateModalShift() {
   resultEl.innerHTML = `
     <div>
       <div class="modal-shift-num">${savedTonnes.toFixed(1)}t</div>
-      <div style="font-size:0.8rem;color:var(--text-muted);">CO₂e saved per match</div>
+      <div class="modal-shift-label">CO₂e saved per match</div>
     </div>
-    <div style="font-size:0.85rem;color:var(--text-muted);flex:1;">
+    <div class="modal-shift-detail">
       If ${switchRate}% of an estimated ${formatPersons(DEFAULT_TOTAL_FANS)} attending fans switch from driving to public transit for an average ${DEFAULT_AVG_DISTANCE_KM} km journey.
     </div>`;
 }

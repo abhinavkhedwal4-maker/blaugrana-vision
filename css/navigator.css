@@ -67,3 +67,7 @@
   font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
 }
 .route-step-text { font-size: 0.9rem; }
+
+
+.route-result-title { margin-bottom: 1rem; }
+.route-result-venue-note { margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); }

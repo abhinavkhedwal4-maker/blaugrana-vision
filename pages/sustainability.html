@@ -51,26 +51,33 @@
 
   <div class="page-hero" id="main-content">
     <div class="section-label">Green Tournament</div>
-    <h1>Sustainability <span style="color:var(--gold)">Tracker</span></h1>
+    <h1>Sustainability <span class="hero-accent">Tracker</span></h1>
     <p>See how every venue stacks up on sustainability, and model how much fan travel emissions could be cut through smarter choices.</p>
   </div>
 
   <div class="page-content">
-    <h2 style="margin-bottom:1rem;">Venue Sustainability Ranking</h2>
+    <h2 class="section-heading">Venue Sustainability Ranking</h2>
     <div class="sustain-leaderboard" id="sustainLeaderboard" role="list" aria-label="Venue sustainability ranking"></div>
 
     <div class="modal-shift-panel">
-      <h2 style="margin-bottom:1rem;">Modal Shift Calculator</h2>
-      <label for="switchRateSlider" style="font-size:0.85rem;color:var(--text-muted);display:block;margin-bottom:0.5rem;">
-        % of fans switching from driving to transit: <span id="switchRateValue" style="color:var(--gold);font-weight:700;">30%</span>
+      <h2 class="section-heading">Modal Shift Calculator</h2>
+      <label for="switchRateSlider" class="slider-label">
+        % of fans switching from driving to transit: <span id="switchRateValue" class="slider-accent">30%</span>
       </label>
-      <input type="range" id="switchRateSlider" min="0" max="100" step="5" value="30" style="width:100%;accent-color:var(--crimson);" aria-label="Percent of fans switching to transit"/>
+      <input type="range" id="switchRateSlider" min="0" max="100" step="5" value="30" class="range-full" aria-label="Percent of fans switching to transit"/>
       <div class="modal-shift-result" id="modalShiftResult"></div>
     </div>
 
-    <h2 style="margin-bottom:1rem;">Green Travel Tips</h2>
+    <h2 class="section-heading">Green Travel Tips</h2>
     <div class="green-tips-grid" id="greenTipsGrid"></div>
   </div>
+
+  <footer class="page-footer-note">
+    <p>GenAI-enabled navigation, crowd management, accessibility, transportation,
+    sustainability, multilingual assistance, operational intelligence and
+    real-time decision support — for fans, organizers, volunteers and venue
+    staff at FIFA World Cup 2026.</p>
+  </footer>
 
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">

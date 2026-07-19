@@ -8,10 +8,11 @@
 
 'use strict';
 
+import { logError } from './errors.js';
 import { STADIUMS, VENUE_STATS } from './stadiums-data.js';
 import { db, auth } from './firebase.js';
 import { initAuth } from './auth.js';
-import { sanitizeString } from './shared.js';
+import { sanitizeString, renderStadiumDropdown } from './shared.js';
 import {
   collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs,
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -84,9 +85,7 @@ function renderSummaryStrip() {
 
 /** Populates the incident form's stadium dropdown. */
 function renderIncidentStadiumSelect() {
-  const select = document.getElementById('incidentStadium');
-  if (!select) return;
-  select.innerHTML = STADIUMS.map((s) => `<option value="${s.id}">${s.commonName}</option>`).join('');
+  renderStadiumDropdown('incidentStadium');
 }
 
 /** Wires the incident logging form. */
@@ -113,6 +112,11 @@ function wireIncidentForm() {
  * @returns {Promise<void>}
  */
 async function logIncident(venueName, details) {
+  if (details.length > 300 || !venueName) {
+    console.error('[Operations] Rejected malformed incident payload');
+    return;
+  }
+
   appendLocalIncident(venueName, details);
 
   if (!auth.currentUser) return;
@@ -121,7 +125,7 @@ async function logIncident(venueName, details) {
       venueName, details, reportedBy: auth.currentUser.uid, createdAt: serverTimestamp(),
     });
   } catch (err) {
-    console.error('[Operations] Incident log error:', err.message);
+    logError('Operations', 'Incident log', err);
   }
 }
 
@@ -161,7 +165,7 @@ async function renderIncidentLog() {
         </div>`;
     }).join('');
   } catch (err) {
-    console.error('[Operations] Incident fetch error:', err.message);
+    logError('Operations', 'Incident fetch', err);
   }
 }
 
@@ -172,7 +176,7 @@ window.requestBriefing = async function requestBriefing() {
   const panel = document.getElementById('briefingContent');
   if (!panel) return;
 
-  panel.innerHTML = '<p style="color:var(--text-muted)">Generating briefing...</p>';
+  panel.innerHTML = '<p class="text-muted">Generating briefing...</p>';
 
   const alertVenues = venueStatuses.filter((v) => v.status === 'alert')
     .map((v) => STADIUMS.find((s) => s.id === v.stadiumId)?.commonName).filter(Boolean);
@@ -200,10 +204,49 @@ As a tournament operations director, write a 3-sentence executive briefing for o
     const { reply } = await res.json();
     panel.innerHTML = `<p>${reply}</p>`;
   } catch (err) {
-    console.error('[Operations] Briefing error:', err.message);
-    panel.innerHTML = '<p style="color:var(--text-muted)">⚠️ Could not generate briefing. Make sure the server is running.</p>';
+    logError('Operations', 'Briefing', err);
+    panel.innerHTML = '<p class="text-muted">⚠️ Could not generate briefing. Make sure the server is running.</p>';
   }
 };
+
+// ─── Role selector ────────────────────────────────────────────────────────────
+
+/**
+ * Wires the role selector buttons and filters visible sections by role.
+ * - organizer: sees everything
+ * - volunteer: sees a simplified checklist view (incident log only)
+ * - venue-staff: sees venue status table + gate info (no AI briefing)
+ */
+function wireRoleSelector() {
+  const row = document.querySelector('.role-select-row');
+  if (!row) return;
+
+  const briefingPanel = document.querySelector('.briefing-panel');
+  const venueTable    = document.querySelector('.venue-status-table')?.closest('div');
+  const incidentPanel = document.querySelector('.incident-panel');
+
+  row.querySelectorAll('.role-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      row.querySelectorAll('.role-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const role = btn.dataset.role;
+
+      if (briefingPanel) briefingPanel.style.display = role === 'organizer' ? '' : 'none';
+
+      if (venueTable) venueTable.style.display = (role === 'organizer' || role === 'venue-staff') ? '' : 'none';
+
+      if (incidentPanel) {
+        const incidentTitle = incidentPanel.querySelector('h2');
+        if (incidentTitle) {
+          incidentTitle.textContent = role === 'volunteer'
+            ? '📋 Volunteer Task Checklist'
+            : 'Log an Incident';
+        }
+      }
+    });
+  });
+}
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
@@ -211,4 +254,5 @@ renderVenueTable();
 renderSummaryStrip();
 renderIncidentStadiumSelect();
 wireIncidentForm();
+wireRoleSelector();
 initAuth(() => renderIncidentLog(), () => {});

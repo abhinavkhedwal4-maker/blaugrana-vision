@@ -9,6 +9,7 @@
 'use strict';
 
 import { STADIUMS } from './stadiums-data.js';
+import { renderStadiumDropdown } from './shared.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -45,13 +46,8 @@ let currentModeId = 'transit';
 
 /** Populates the stadium dropdown. */
 function renderStadiumSelect() {
-  const select = document.getElementById('transportStadiumSelect');
-  if (!select) return;
-  select.innerHTML = STADIUMS.map((s) =>
-    `<option value="${s.id}">${s.commonName} — ${s.city}</option>`,
-  ).join('');
-  select.addEventListener('change', (e) => {
-    currentStadiumId = e.target.value;
+  renderStadiumDropdown('transportStadiumSelect', (value) => {
+    currentStadiumId = value;
     renderTransitLines();
   });
 }
@@ -104,7 +100,7 @@ function calculateDeparture() {
       <div class="departure-time">${timeStr}</div>
       <div class="departure-label">Recommended departure via ${mode.name}</div>
     </div>
-    <div style="font-size:0.85rem;color:var(--text-muted);flex:1;">
+    <div class="departure-note">
       Includes ~${mode.etaMin} min travel time plus ${ARRIVAL_BUFFER_MIN} min for security screening and entry, so you're seated well before kickoff.
     </div>`;
 }

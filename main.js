@@ -8,6 +8,7 @@
 import { initAuth, loginWithGoogle, logout } from './js/auth.js';
 import { throttleRaf, formatPersons } from './js/shared.js';
 import { STADIUMS, VENUE_STATS } from './js/stadiums-data.js';
+import { logError } from './js/errors.js';
 
 // ---- PARTICLE CANVAS ----
 const canvas = document.getElementById('particleCanvas');
@@ -98,7 +99,7 @@ loginBtn?.addEventListener('click', async () => {
   try {
     await loginWithGoogle();
   } catch (err) {
-    console.error('[Auth] Login failed:', err.message);
+    logError('Auth', 'Login', err);
   }
 });
 
@@ -106,7 +107,7 @@ window.handleLogout = async function handleLogout() {
   try {
     await logout();
   } catch (err) {
-    console.error('[Auth] Logout failed:', err.message);
+    logError('Auth', 'Logout', err);
   }
 };
 
@@ -150,3 +151,13 @@ document.querySelectorAll('.feature-card, .meter-card').forEach((el) => {
   el.style.opacity = '0';
   observer.observe(el);
 });
+
+// ---- TOURNAMENT COUNTDOWN ----
+const TOURNAMENT_START = new Date('2026-06-11T00:00:00');
+function renderCountdown() {
+  const el = document.getElementById('tournamentCountdown');
+  if (!el) return;
+  const days = Math.max(0, Math.ceil((TOURNAMENT_START - new Date()) / 86_400_000));
+  el.textContent = days > 0 ? `${days} days until kickoff` : 'Tournament is live!';
+}
+renderCountdown();

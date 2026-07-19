@@ -9,7 +9,7 @@
 'use strict';
 
 import { STADIUMS, getStadiumById } from './stadiums-data.js';
-import { sanitizeString } from './shared.js';
+import { sanitizeString, renderStadiumDropdown } from './shared.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -70,14 +70,7 @@ function renderAccessOptions() {
 
 /** Populates the stadium dropdown used by the amenity locator. */
 function renderStadiumSelect() {
-  const select = document.getElementById('accessStadiumSelect');
-  if (!select) return;
-
-  select.innerHTML = STADIUMS.map((s) =>
-    `<option value="${s.id}">${s.commonName} — ${s.city}</option>`,
-  ).join('');
-
-  select.addEventListener('change', renderAmenities);
+  renderStadiumDropdown('accessStadiumSelect', () => renderAmenities());
   renderAmenities();
 }
 
@@ -89,7 +82,7 @@ function renderAmenities() {
   if (!list || !stadium) return;
 
   list.innerHTML = `
-    <h3 style="margin-bottom:0.75rem;">Accessible Amenities — ${stadium.commonName}</h3>
+    <h3 class="amenities-heading">Accessible Amenities — ${stadium.commonName}</h3>
     ${AMENITIES.map((a) => `
       <div class="amenity-row" role="listitem">
         <span class="amenity-icon" aria-hidden="true">${a.icon}</span>
@@ -135,10 +128,10 @@ function showConfirmation(stadium, details) {
 
   toast.classList.remove('hidden');
   toast.innerHTML = `
-    <span style="font-size:1.4rem" aria-hidden="true">✅</span>
+    <span class="toast-check-icon" aria-hidden="true">✅</span>
     <div>
       <strong>Request received for ${stadium.commonName}</strong>
-      <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.2rem;">
+      <p class="toast-detail-text">
         Services: ${selectedLabels}${details ? ` — Note: "${details}"` : ''}. Guest Services has been notified and will meet you at your nearest gate.
       </p>
     </div>`;
@@ -147,11 +140,7 @@ function showConfirmation(stadium, details) {
 
 /** Populates the assistance form's stadium dropdown. */
 function renderAssistStadiumSelect() {
-  const select = document.getElementById('assistStadium');
-  if (!select) return;
-  select.innerHTML = STADIUMS.map((s) =>
-    `<option value="${s.id}">${s.commonName} — ${s.city}</option>`,
-  ).join('');
+  renderStadiumDropdown('assistStadium');
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────

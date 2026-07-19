@@ -9,6 +9,15 @@
 
 'use strict';
 
+import { STADIUMS } from './stadiums-data.js';
+
+/**
+ * Represents a single message in an AI conversation.
+ * @typedef {Object} ChatMessage
+ * @property {'user'|'assistant'|'system'} role    - Sender role
+ * @property {string}                      content - Message text
+ */
+
 /** Maximum length allowed for any sanitised user-facing string */
 const DEFAULT_MAX_LENGTH = 2000;
 
@@ -177,6 +186,25 @@ export function showToast(message, duration = 3000, id = 'bvToast') {
 export function formatPersons(n) {
   if (typeof n !== 'number' || !isFinite(n)) return '0';
   return n.toLocaleString();
+}
+
+// ─── Stadium dropdown helper ─────────────────────────────────────────────────
+
+/**
+ * Populates a `<select>` element with all stadium options.
+ * Shared by navigator.js, accessibility.js, and transport.js to avoid
+ * copy-pasting identical dropdown-render logic.
+ *
+ * @param {string} selectId - Target select element's id
+ * @param {function(string):void} [onChange] - Optional change handler
+ * @returns {void}
+ */
+export function renderStadiumDropdown(selectId, onChange) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  select.innerHTML = STADIUMS.map((s) =>
+    `<option value="${s.id}">${s.commonName} — ${s.city}</option>`).join('');
+  if (onChange) select.addEventListener('change', (e) => onChange(e.target.value));
 }
 
 // ─── Mobile nav ───────────────────────────────────────────────────────────────

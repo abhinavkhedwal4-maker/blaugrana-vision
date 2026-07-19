@@ -63,13 +63,26 @@ export default async function handler(req, res) {
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
+  res.setHeader('Content-Security-Policy',
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://apis.google.com; " +
+    "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; " +
+    "font-src https://fonts.gstatic.com; " +
+    "connect-src 'self' https://api.groq.com https://*.googleapis.com https://*.firebaseio.com https://www.gstatic.com; " +
+    "img-src 'self' data: https://*.googleusercontent.com;");
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
   if (req.method !== 'POST')    { res.status(405).json({ error: 'Method not allowed' }); return; }
+
+  const contentType = req.headers['content-type'] || '';
+  if (!contentType.includes('application/json')) {
+    res.status(415).json({ error: 'Content-Type must be application/json' });
+    return;
+  }
 
   if (!process.env.GROQ_API_KEY) {
     res.status(503).json({ error: 'AI service not configured' });
@@ -108,6 +121,7 @@ export default async function handler(req, res) {
     const reply = data.choices?.[0]?.message?.content;
     if (!reply) { res.status(500).json({ error: 'Empty AI response' }); return; }
 
+    res.setHeader('Cache-Control', 'no-store');
     res.status(200).json({ reply });
   } catch (err) {
     console.error('[Groq Proxy Error]', err.message);

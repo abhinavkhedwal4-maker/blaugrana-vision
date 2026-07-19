@@ -8,12 +8,22 @@
 
 'use strict';
 
+import { logError } from './errors.js';
 import { sanitizeString, formatMessage } from './shared.js';
 
 const ENDPOINT       = '/api/chat';
 const MAX_MSG_LENGTH = 500;
 const RATE_LIMIT     = 10;
 const RATE_WINDOW_MS = 60_000;
+
+/** Maps BCP-47 language codes to full language names for AI instruction */
+const LANGUAGE_NAMES = Object.freeze({
+  es: 'Spanish',
+  fr: 'French',
+  pt: 'Portuguese',
+  zh: 'Mandarin Chinese',
+  ar: 'Arabic',
+});
 
 const SYSTEM_PROMPT = `You are Blaugrana AI, the official GenAI assistant for Blaugrana Vision at the FIFA World Cup 2026. Help fans, volunteers and organisers with:
 - Navigation to seats, gates, concessions and accessible routes
@@ -30,7 +40,7 @@ Guidelines:
 - Keep responses to 3-4 short paragraphs maximum
 - End with one clear, actionable next step`;
 
-/** @type {Array<{role:string, content:string}>} */
+/** @type {ChatMessage[]} */
 let conversationHistory = [];
 
 /** @type {Array<number>} */
@@ -115,7 +125,7 @@ function showTyping() {
   bubble.setAttribute('aria-label', 'Blaugrana AI is thinking...');
   bubble.innerHTML = `
     <div class="bubble-avatar" aria-hidden="true">⚽</div>
-    <div class="bubble-content" style="padding:0.8rem 1rem;">
+    <div class="bubble-content bubble-content--typing">
       <div class="typing-indicator" aria-hidden="true">
         <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
       </div>
@@ -194,12 +204,16 @@ async function sendMessage() {
   const typingId = showTyping();
 
   try {
+    const langNote = window.blaugranaLang && window.blaugranaLang !== 'en'
+      ? ` Respond in ${LANGUAGE_NAMES[window.blaugranaLang]} unless the user writes in English.`
+      : '';
+
     const response = await fetch(ENDPOINT, {
       method : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body   : JSON.stringify({
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: `${SYSTEM_PROMPT}${langNote}` },
           ...conversationHistory,
         ],
       }),
@@ -222,7 +236,7 @@ async function sendMessage() {
     removeTyping(typingId);
     appendMessage('ai', `⚠️ ${error.message} Make sure the server is running.`);
     conversationHistory.pop();
-    console.error('[Blaugrana AI Error]', error);
+    logError('Blaugrana AI', 'Message send', error);
   } finally {
     isProcessing = false;
     setSendButtonState(false);

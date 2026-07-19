@@ -51,28 +51,35 @@
 
   <div class="page-hero" id="main-content">
     <div class="section-label">Plan Your Journey</div>
-    <h1>Transport <span style="color:var(--gold)">Intelligence</span></h1>
+    <h1>Transport <span class="hero-accent">Intelligence</span></h1>
     <p>Compare travel modes, get your ideal departure time, and check live transit status — all matched to kickoff.</p>
   </div>
 
   <div class="page-content">
-    <select class="nav-select" id="transportStadiumSelect" aria-label="Select stadium" style="margin-bottom:1.5rem;max-width:400px;padding:0.75rem 1rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);"></select>
+    <select class="nav-select venue-picker" id="transportStadiumSelect" aria-label="Select stadium"></select>
 
-    <h2 style="margin-bottom:1rem;">Compare Travel Modes</h2>
+    <h2 class="section-heading">Compare Travel Modes</h2>
     <div class="transport-modes" id="modeGrid" role="radiogroup" aria-label="Travel mode options"></div>
 
     <div class="departure-planner">
-      <h2 style="margin-bottom:1rem;">Departure Planner</h2>
-      <div class="form-group" style="max-width:260px;">
-        <label for="kickoffTime" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">Kickoff time</label>
-        <input type="time" id="kickoffTime" value="19:00" style="width:100%;padding:0.75rem 1rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;"/>
+      <h2 class="section-heading">Departure Planner</h2>
+      <div class="form-group kickoff-time-group">
+        <label for="kickoffTime">Kickoff time</label>
+        <input type="time" id="kickoffTime" value="19:00" class="kickoff-input"/>
       </div>
       <div class="departure-result hidden" id="departureResult"></div>
     </div>
 
-    <h2 style="margin-bottom:1rem;">Live Transit Status</h2>
+    <h2 class="section-heading">Live Transit Status</h2>
     <div class="transit-line-list" id="transitLineList" role="list" aria-label="Transit line status"></div>
   </div>
+
+  <footer class="page-footer-note">
+    <p>GenAI-enabled navigation, crowd management, accessibility, transportation,
+    sustainability, multilingual assistance, operational intelligence and
+    real-time decision support — for fans, organizers, volunteers and venue
+    staff at FIFA World Cup 2026.</p>
+  </footer>
 
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">

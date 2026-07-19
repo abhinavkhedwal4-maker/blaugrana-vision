@@ -51,7 +51,7 @@
 
   <div class="page-hero" id="main-content">
     <div class="section-label">Multilingual Wayfinding</div>
-    <h1>Never Get <span style="color:var(--gold)">Lost</span> Again</h1>
+    <h1>Never Get <span class="hero-accent">Lost</span> Again</h1>
     <p>Find your seat, gate, or nearest amenity in seconds — ask in any language.</p>
   </div>
 
@@ -62,15 +62,31 @@
         <input type="text" class="nav-input" id="navSearchInput" placeholder="e.g. 'Where is the nearest halal food stand?'" aria-label="Ask a wayfinding question"/>
         <button class="btn btn-primary" id="navSearchBtn" aria-label="Ask Blaugrana AI">Ask AI</button>
       </div>
-      <p id="langHint" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.6rem;">Ask Blaugrana AI anything — responses default to English.</p>
+      <p id="langHint" class="lang-hint">Ask Blaugrana AI anything — responses default to English.</p>
       <div class="lang-pills" id="langPillRow" role="group" aria-label="Select response language"></div>
     </div>
 
-    <h2 style="margin-bottom:1rem;">Quick Destinations</h2>
+    <h2 class="section-heading">Quick Destinations</h2>
     <div class="poi-grid" id="poiGrid" role="list" aria-label="Points of interest"></div>
 
     <div class="route-result hidden" id="routeResult" aria-live="polite"></div>
+
+    <div class="planner-panel" style="margin-top:2rem;padding:1.5rem;background:var(--surface,#1a1a2e);border:1px solid var(--border,#2a2a4a);border-radius:12px;">
+      <h2 style="margin-bottom:0.5rem">Generate My Match Day Plan</h2>
+      <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem">
+        Get a personalized, step-by-step plan — arrival time, transport, gate, and amenities — built around your match.
+      </p>
+      <button class="btn btn-primary" onclick="generateMatchPlan()" id="planBtn" aria-label="Generate AI match day plan">✨ Generate My Plan</button>
+      <div id="planResult" class="route-result hidden" aria-live="polite" style="margin-top:1rem"></div>
+    </div>
   </div>
+
+  <footer class="page-footer-note">
+    <p>GenAI-enabled navigation, crowd management, accessibility, transportation,
+    sustainability, multilingual assistance, operational intelligence and
+    real-time decision support — for fans, organizers, volunteers and venue
+    staff at FIFA World Cup 2026.</p>
+  </footer>
 
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">

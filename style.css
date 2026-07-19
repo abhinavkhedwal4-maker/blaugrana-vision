@@ -284,6 +284,7 @@ a:focus:not(:focus-visible),
 }
 .chat-bubble.user .bubble-avatar { background: var(--dark-light); font-size:0.7rem; font-family:'Space Mono',monospace; font-weight:700; color:var(--gold); }
 .bubble-content { max-width:80%; padding: 1rem 1.2rem; border-radius:16px; font-size:0.9rem; line-height:1.6; }
+.bubble-content--typing { padding: 0.8rem 1rem; }
 .chat-bubble.ai .bubble-content { background: var(--glass); border: 1px solid var(--border); border-radius: 4px 16px 16px 16px; }
 .chat-bubble.user .bubble-content { background: linear-gradient(135deg, var(--crimson), var(--crimson-bright)); color: var(--white); border-radius: 16px 4px 16px 16px; }
 .bubble-content p { margin-bottom:0.5rem; }
@@ -396,4 +397,124 @@ a:focus:not(:focus-visible),
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---- SHARED PAGE UTILITY CLASSES ---- */
+
+/* Hero accent colour span (replaces inline style="color:var(--gold)") */
+.hero-accent { color: var(--gold); }
+
+/* Section headings with bottom margin */
+.section-heading    { margin-bottom: 1rem; }
+.section-heading-sm { margin-bottom: 0.5rem; }
+
+/* Muted hint text under headings */
+.section-hint { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+
+/* Muted paragraph text */
+.text-muted { color: var(--text-muted); }
+
+/* Venue/stadium picker select element */
+.venue-picker {
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+  padding: 0.75rem 1rem;
+  background: var(--dark-mid);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+}
+
+/* Amenity list with bottom spacing */
+.amenity-list--spaced { margin-bottom: 3rem; }
+
+/* Buttons: full-width centred (incident form) */
+.btn-full-width { width: 100%; justify-content: center; }
+
+/* Button with top gap (crowd-ops simulate panel) */
+.btn-top-gap { margin-top: 0.5rem; }
+
+/* Button with bottom gap (briefing panel) */
+.btn-briefing-gap { margin-bottom: 1rem; }
+
+/* Stats grid with bottom spacing */
+.ops-stats-grid--spaced { margin-bottom: 2rem; }
+
+/* Lang hint paragraph */
+.lang-hint { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+
+/* Slider label */
+.slider-label { font-size: 0.85rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem; }
+.slider-accent { color: var(--gold); font-weight: 700; }
+.range-full { width: 100%; accent-color: var(--crimson); }
+
+/* Kickoff time group in departure planner */
+.kickoff-time-group { max-width: 260px; }
+.kickoff-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--dark-mid);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+/* Role selector row in Operations */
+.role-select-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.role-btn {
+  padding: 0.45rem 1.1rem;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+.role-btn:hover { border-color: var(--gold); color: var(--gold); }
+.role-btn.active {
+  background: linear-gradient(135deg, var(--crimson), var(--crimson-bright));
+  border-color: transparent;
+  color: var(--white);
+}
+
+/* Incident form fields (replaces inline styles) */
+.incident-form .form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+.incident-form .form-group select,
+.incident-form .form-group textarea {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  background: var(--dark-mid);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  resize: vertical;
+}
+.incident-form .form-group textarea { min-height: 70px; }
+
+/* Page-level footer note (brief language anchor) */
+.page-footer-note {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto;
+  padding: 1.25rem 2rem 2.5rem;
+  border-top: 1px solid var(--border);
+}
+.page-footer-note p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+  line-height: 1.7;
 }

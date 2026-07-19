@@ -35,6 +35,8 @@
   border: 1px solid rgba(34,197,94,0.35); border-radius: var(--radius); margin-top: 1rem;
 }
 .modal-shift-num { font-size: 2rem; font-weight: 800; color: var(--green); }
+.modal-shift-label { font-size: 0.8rem; color: var(--text-muted); }
+.modal-shift-detail { font-size: 0.85rem; color: var(--text-muted); flex: 1; }
 
 .green-tips-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;

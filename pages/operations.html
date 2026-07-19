@@ -51,42 +51,55 @@
 
   <div class="page-hero" id="main-content">
     <div class="section-label">For Organisers & Volunteers</div>
-    <h1>Operations <span style="color:var(--gold)">Command Centre</span></h1>
+    <h1>Operations <span class="hero-accent">Command Centre</span></h1>
     <p>Unified real-time intelligence across all 16 venues — status, incidents, and AI-generated briefings in one place.</p>
   </div>
 
   <div class="page-content">
-    <div class="ops-stats-grid" id="opsCommandSummary" style="margin-bottom:2rem;"></div>
+    <div class="ops-stats-grid ops-stats-grid--spaced" id="opsCommandSummary"></div>
+
+    <div class="role-select-row" role="group" aria-label="Select your role">
+      <button class="role-btn active" data-role="organizer">Organizer</button>
+      <button class="role-btn" data-role="volunteer">Volunteer</button>
+      <button class="role-btn" data-role="venue-staff">Venue Staff</button>
+    </div>
 
     <div class="ops-command-grid">
       <div>
-        <h2 style="margin-bottom:1rem;">Venue Status — All 16 Stadiums</h2>
+        <h2 class="section-heading">Venue Status — All 16 Stadiums</h2>
         <div class="venue-status-table" id="venueStatusTable" role="table" aria-label="Venue status table"></div>
       </div>
 
       <div class="incident-panel">
-        <h2 style="margin-bottom:1rem;">Log an Incident</h2>
+        <h2 class="section-heading">Log an Incident</h2>
         <form class="incident-form" id="incidentForm" aria-label="Incident logging form">
           <div class="form-group">
-            <label for="incidentStadium" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">Venue</label>
-            <select id="incidentStadium" required style="width:100%;padding:0.6rem 0.9rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);"></select>
+            <label for="incidentStadium">Venue</label>
+            <select id="incidentStadium" required></select>
           </div>
           <div class="form-group">
-            <label for="incidentDetails" style="display:block;font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">Details</label>
-            <textarea id="incidentDetails" required maxlength="300" placeholder="e.g. Gate C queue exceeding 15 min wait" style="width:100%;padding:0.6rem 0.9rem;background:var(--dark-mid);border:1px solid var(--border);border-radius:8px;color:var(--text);resize:vertical;min-height:70px;"></textarea>
+            <label for="incidentDetails">Details</label>
+            <textarea id="incidentDetails" required maxlength="300" placeholder="e.g. Gate C queue exceeding 15 min wait"></textarea>
           </div>
-          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">Log Incident</button>
+          <button type="submit" class="btn btn-primary btn-full-width">Log Incident</button>
         </form>
         <div class="incident-log" id="incidentLog" role="log" aria-live="polite" aria-label="Recent incidents"></div>
       </div>
     </div>
 
     <div class="briefing-panel">
-      <h2 style="margin-bottom:1rem;">🤖 AI Operations Briefing</h2>
-      <button class="btn btn-primary" type="button" onclick="requestBriefing()" style="margin-bottom:1rem;">Generate Briefing</button>
-      <div id="briefingContent"><p style="color:var(--text-muted)">Click "Generate Briefing" for an AI-authored summary of current tournament-wide status.</p></div>
+      <h2 class="section-heading">🤖 Real-Time Operational Intelligence Briefing</h2>
+      <button class="btn btn-primary btn-briefing-gap" type="button" onclick="requestBriefing()">Generate Briefing</button>
+      <div id="briefingContent"><p class="text-muted">Click "Generate Briefing" for an AI-authored summary of current tournament-wide status.</p></div>
     </div>
   </div>
+
+  <footer class="page-footer-note">
+    <p>GenAI-enabled navigation, crowd management, accessibility, transportation,
+    sustainability, multilingual assistance, operational intelligence and
+    real-time decision support — for fans, organizers, volunteers and venue
+    staff at FIFA World Cup 2026.</p>
+  </footer>
 
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">

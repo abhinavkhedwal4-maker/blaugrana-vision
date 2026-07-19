@@ -49,3 +49,4 @@
 .transit-status.normal { background: rgba(34,197,94,0.15); color: var(--green); }
 .transit-status.delayed { background: var(--gold-soft); color: var(--gold); }
 .transit-status.crowded { background: rgba(217,44,71,0.2); color: var(--crimson-bright); }
+.departure-note { font-size: 0.85rem; color: var(--text-muted); flex: 1; }

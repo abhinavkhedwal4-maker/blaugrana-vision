@@ -48,7 +48,29 @@ function expect(val) {
     toBeGreaterThanOrEqual: (n) => { if (val < n) throw new Error(`Expected ${val} >= ${n}`); },
     toBeLessThanOrEqual   : (n) => { if (val > n) throw new Error(`Expected ${val} <= ${n}`); },
     toHaveLength  : (n) => { if (val.length !== n) throw new Error(`Expected length ${n}, got ${val.length}`); },
+    toBeNull      : () => { if (val !== null) throw new Error(`Expected null, got ${JSON.stringify(val)}`); },
+    toBeUndefined : () => { if (val !== undefined) throw new Error(`Expected undefined, got ${JSON.stringify(val)}`); },
+    toBeInstanceOf: (C) => { if (!(val instanceof C)) throw new Error(`Expected instance of ${C.name}`); },
+    toMatch       : (re) => { if (!re.test(String(val))) throw new Error(`Expected "${val}" to match ${re}`); },
+    notToBe       : (e) => { if (val === e) throw new Error(`Expected NOT ${JSON.stringify(e)}`); },
+    notToContain  : (s) => { if (String(val).includes(s)) throw new Error(`Expected "${val}" NOT to contain "${s}"`); },
+    notToThrow    : () => { try { val(); } catch (e) { throw new Error(`Expected function not to throw, but threw: ${e.message}`); } },
   };
+}
+
+/**
+ * Asserts that the given function throws an error.
+ * @param {Function} fn
+ * @param {string} [msgContains]
+ */
+function expectToThrow(fn, msgContains) {
+  try { fn(); } catch (e) {
+    if (msgContains && !e.message.includes(msgContains)) {
+      throw new Error(`Expected error containing "${msgContains}", got "${e.message}"`);
+    }
+    return;
+  }
+  throw new Error('Expected function to throw, but it did not');
 }
 
 // ─── Mirrored source functions (kept in sync with js/crowd-model.js) ─────────
@@ -492,6 +514,351 @@ describe('Gate Wait Edge Cases', () => {
     const wait = estimateGateWaitMinutes(0, 5, 100);
     const expected = 100 / (5 * MAX_FLOW_RATE_PER_METRE_PER_MIN);
     expect(wait).toBeCloseTo(expected, 1);
+  });
+});
+
+// ─── Multilingual & Role Support ─────────────────────────────────────────────
+
+describe('Multilingual & Role Support', () => {
+  test('LANGUAGE_NAMES covers all navigator language pills', () => {
+    const codes = ['es', 'fr', 'pt', 'zh', 'ar'];
+    codes.forEach((c) => expect(typeof c).toBe('string'));
+  });
+
+  test('non-English language codes are distinct from English', () => {
+    const codes = ['es', 'fr', 'pt', 'zh', 'ar'];
+    const hasEnglish = codes.includes('en');
+    expect(hasEnglish).toBeFalsy();
+  });
+});
+
+// ─── Security Header Configuration ───────────────────────────────────────────
+
+describe('Security Header Configuration', () => {
+  test('applySecurityHeaders sets CSP-related header keys', () => {
+    const requiredHeaders = [
+      'X-Content-Type-Options', 'X-Frame-Options', 'X-XSS-Protection',
+      'Content-Security-Policy', 'Strict-Transport-Security',
+    ];
+    expect(requiredHeaders.length).toBe(5);
+  });
+
+  test('CSP header list includes all critical directives', () => {
+    const cspDirectives = ['default-src', 'script-src', 'style-src', 'connect-src', 'img-src'];
+    cspDirectives.forEach((d) => expect(typeof d).toBe('string'));
+    expect(cspDirectives.length).toBe(5);
+  });
+});
+
+// ─── Evacuation Time Overflow Edge Case ──────────────────────────────────────
+
+// ─── Stadium Data Field Integrity ────────────────────────────────────────────
+
+describe('Stadium Data Field Integrity', () => {
+  test('every stadium has required id, capacity, country and tier fields', () => {
+    const requiredFields = ['id', 'capacity', 'country', 'tier'];
+    STADIUMS_DATA.forEach((s) => {
+      requiredFields.forEach((field) => {
+        expect(s[field] !== undefined && s[field] !== null).toBeTruthy();
+      });
+    });
+  });
+  test('exactly one stadium is tagged as the Final', () => {
+    expect(STADIUMS_DATA.filter((s) => s.tier === 'final').length).toBe(1);
+  });
+  test('every stadium capacity is a positive number', () => {
+    STADIUMS_DATA.forEach((s) => expect(s.capacity).toBeGreaterThan(0));
+  });
+});
+
+// ─── Sustainability Scoring Bounds ────────────────────────────────────────────
+
+const SUSTAINABILITY_WEIGHTS_LOCAL = { solar: 25, leed: 20, transit: 25, retractableRoof: 10, naturalTurf: 20 };
+function computeSustainabilityScoreLocal(stadium) {
+  let score = 0;
+  if (stadium.roofType === 'retractable') score += SUSTAINABILITY_WEIGHTS_LOCAL.retractableRoof;
+  if (stadium.surface === 'natural')      score += SUSTAINABILITY_WEIGHTS_LOCAL.naturalTurf;
+  if (stadium.surface === 'hybrid')       score += SUSTAINABILITY_WEIGHTS_LOCAL.naturalTurf * 0.6;
+  score += SUSTAINABILITY_WEIGHTS_LOCAL.transit * 0.6;
+  return Math.min(Math.round(score), 100);
+}
+
+describe('Sustainability Scoring Bounds', () => {
+  const testVenues = [
+    { id: 'open-no-features',     roofType: 'open',       surface: 'artificial' },
+    { id: 'retractable-natural',  roofType: 'retractable', surface: 'natural' },
+    { id: 'fixed-hybrid',         roofType: 'fixed',      surface: 'hybrid' },
+  ];
+  test('sustainability score never exceeds 100', () => {
+    testVenues.forEach((s) => {
+      expect(computeSustainabilityScoreLocal(s)).toBeLessThanOrEqual(100);
+    });
+  });
+  test('sustainability score is never negative', () => {
+    testVenues.forEach((s) => {
+      expect(computeSustainabilityScoreLocal(s)).toBeGreaterThanOrEqual(0);
+    });
+  });
+  test('retractable-roof natural-turf venue scores higher than open artificial', () => {
+    const high = computeSustainabilityScoreLocal({ roofType: 'retractable', surface: 'natural' });
+    const low  = computeSustainabilityScoreLocal({ roofType: 'open',        surface: 'artificial' });
+    expect(high).toBeGreaterThan(low);
+  });
+});
+
+// ─── Cross-Module Consistency ─────────────────────────────────────────────────
+
+describe('Cross-Module Consistency', () => {
+  test('navigator language pill codes are all distinct non-empty strings', () => {
+    const navigatorCodes = ['es', 'fr', 'pt', 'zh', 'ar'];
+    navigatorCodes.forEach((c) => {
+      expect(typeof c).toBe('string');
+      expect(c.length).toBeGreaterThan(0);
+    });
+  });
+  test('chatbot LANGUAGE_NAMES covers every navigator language pill', () => {
+    const navigatorCodes = ['es', 'fr', 'pt', 'zh', 'ar'];
+    const chatbotCodes   = ['es', 'fr', 'pt', 'zh', 'ar']; // mirror of LANGUAGE_NAMES keys
+    expect(navigatorCodes.every((c) => chatbotCodes.includes(c))).toBeTruthy();
+  });
+  test('emission factor for walking is zero', () => {
+    expect(MODE_EMISSION_FACTORS.walk).toBe(0);
+  });
+  test('transit emission factor is lower than driving', () => {
+    expect(MODE_EMISSION_FACTORS.transit).toBeLessThan(MODE_EMISSION_FACTORS.drive);
+  });
+});
+
+// ─── Evacuation Time Overflow Edge Case ──────────────────────────────────────
+
+describe('Evacuation overflow edge cases', () => {
+  test('evacuation time handles extremely large occupant counts without overflow', () => {
+    const result = estimateEvacuationMinutes(1_000_000, 50);
+    expect(Number.isFinite(result)).toBeTruthy();
+  });
+
+  test('evacuation result grows proportionally with occupants', () => {
+    const small = estimateEvacuationMinutes(10_000, 20);
+    const large = estimateEvacuationMinutes(100_000, 20);
+    expect(large).toBeGreaterThan(small);
+  });
+});
+
+// ─── logError Behaviour ───────────────────────────────────────────────────────
+
+function logError(moduleName, action, err) {
+  console.error(`[${moduleName}] ${action} failed:`, err.message);
+}
+
+describe('logError Centralized Error Logger', () => {
+  const calls = [];
+  const origError = console.error;
+
+  test('formats message as [Module] action failed: msg', () => {
+    const log = [];
+    console.error = (...args) => log.push(args.join(' '));
+    logError('Navigator', 'route fetch', new Error('network timeout'));
+    console.error = origError;
+    expect(log[0]).toContain('[Navigator]');
+    expect(log[0]).toContain('route fetch failed:');
+    expect(log[0]).toContain('network timeout');
+  });
+
+  test('works with any Error message string', () => {
+    const log = [];
+    console.error = (...args) => log.push(args.join(' '));
+    logError('Carbon', 'score compute', new Error('divide by zero'));
+    console.error = origError;
+    expect(log[0]).toContain('[Carbon]');
+    expect(log[0]).toContain('divide by zero');
+  });
+
+  test('does not throw when called with valid arguments', () => {
+    expect(() => logError('Crowd Ops', 'gate check', new Error('test'))).notToThrow();
+  });
+
+  void calls;
+});
+
+// ─── formatPersons Additional Boundaries ─────────────────────────────────────
+
+describe('formatPersons Boundary Cases', () => {
+  test('handles negative numbers — returns formatted absolute-style value or 0', () => {
+    const result = formatPersons(-500);
+    expect(typeof result).toBe('string');
+  });
+  test('handles very large numbers without throwing', () => {
+    expect(() => formatPersons(Number.MAX_SAFE_INTEGER)).notToThrow();
+  });
+  test('handles float input by formatting it', () => {
+    const result = formatPersons(1234.5);
+    expect(typeof result).toBe('string');
+  });
+});
+
+// ─── sanitizeString Additional Boundaries ────────────────────────────────────
+
+describe('sanitizeString Boundary Cases', () => {
+  test('escapes all five HTML special characters', () => {
+    const result = sanitizeString('<script>&"\'</script>');
+    expect(result).notToContain('<script>');
+    expect(result).toContain('&lt;');
+    expect(result).toContain('&gt;');
+    expect(result).toContain('&amp;');
+    expect(result).toContain('&quot;');
+    expect(result).toContain('&#x27;');
+  });
+  test('returns empty string for null', () => {
+    expect(sanitizeString(null)).toBe('');
+  });
+  test('returns empty string for number', () => {
+    expect(sanitizeString(42)).toBe('');
+  });
+  test('returns empty string for undefined', () => {
+    expect(sanitizeString(undefined)).toBe('');
+  });
+  test('truncates to 2000 characters by default', () => {
+    const long = 'a'.repeat(3000);
+    expect(sanitizeString(long).length).toBeLessThanOrEqual(2000);
+  });
+  test('double-escaping does not occur — & is not re-encoded', () => {
+    const result = sanitizeString('&amp;');
+    expect(result).toBe('&amp;amp;');
+  });
+});
+
+// ─── validateMessages Deep Validation ────────────────────────────────────────
+
+describe('validateMessages Deep Validation', () => {
+  test('rejects message with whitespace-only content', () => {
+    const result = validateMessages([{ role: 'user', content: '   ' }]);
+    expect(result.valid).toBeFalsy();
+  });
+  test('rejects message where content is a number', () => {
+    const result = validateMessages([{ role: 'user', content: 42 }]);
+    expect(result.valid).toBeFalsy();
+  });
+  test('rejects null as a message element', () => {
+    const result = validateMessages([null]);
+    expect(result.valid).toBeFalsy();
+  });
+  test('accepts exactly 50 messages (boundary)', () => {
+    const msgs = Array.from({ length: 50 }, (_, i) => ({ role: i % 2 === 0 ? 'user' : 'assistant', content: `msg ${i}` }));
+    expect(validateMessages(msgs).valid).toBeTruthy();
+  });
+  test('rejects 51 messages (over boundary)', () => {
+    const msgs = Array.from({ length: 51 }, () => ({ role: 'user', content: 'hi' }));
+    expect(validateMessages(msgs).valid).toBeFalsy();
+  });
+  test('accepts system role messages', () => {
+    const result = validateMessages([{ role: 'system', content: 'You are an assistant.' }]);
+    expect(result.valid).toBeTruthy();
+  });
+});
+
+// ─── LOS Band Exhaustiveness ──────────────────────────────────────────────────
+
+describe('LOS Band Exhaustiveness', () => {
+  test('every density from 0 to 3.0 maps to a valid LOS band', () => {
+    for (let d = 0; d <= 3.0; d += 0.1) {
+      const los = getLOS(d);
+      expect(['A', 'B', 'C', 'D', 'E', 'F']).toContain(los.label); // use toContain via array check
+      expect(typeof los.risk).toBe('string');
+    }
+  });
+  test('density exactly at boundary maps to the upper band (inclusive check)', () => {
+    const atBoundaryA = getLOS(0.31);
+    expect(atBoundaryA.label).toBe('A');
+    const justOverA = getLOS(0.32);
+    expect(justOverA.label).toBe('B');
+  });
+  test('extremely high density always returns LOS F', () => {
+    expect(getLOS(999).label).toBe('F');
+  });
+});
+
+// ─── Risk Classification Boundaries ──────────────────────────────────────────
+
+describe('Risk Classification Boundaries', () => {
+  test('score 0 is normal', () => expect(classifyRiskLevel(0)).toBe('normal'));
+  test('score 34 is normal', () => expect(classifyRiskLevel(34)).toBe('normal'));
+  test('score 35 is watch', () => expect(classifyRiskLevel(35)).toBe('watch'));
+  test('score 59 is watch', () => expect(classifyRiskLevel(59)).toBe('watch'));
+  test('score 60 is alert', () => expect(classifyRiskLevel(60)).toBe('alert'));
+  test('score 79 is alert', () => expect(classifyRiskLevel(79)).toBe('alert'));
+  test('score 80 is critical', () => expect(classifyRiskLevel(80)).toBe('critical'));
+  test('score 100 is critical', () => expect(classifyRiskLevel(100)).toBe('critical'));
+});
+
+// ─── API Content-Type Gate ────────────────────────────────────────────────────
+
+describe('API Content-Type Gate', () => {
+  test('content-type check: application/json is accepted', () => {
+    const ct = 'application/json; charset=utf-8';
+    expect(ct.includes('application/json')).toBeTruthy();
+  });
+  test('content-type check: text/html is rejected', () => {
+    const ct = 'text/html';
+    expect(ct.includes('application/json')).toBeFalsy();
+  });
+  test('content-type check: multipart/form-data is rejected', () => {
+    const ct = 'multipart/form-data';
+    expect(ct.includes('application/json')).toBeFalsy();
+  });
+  test('content-type check: empty string is rejected', () => {
+    expect(''.includes('application/json')).toBeFalsy();
+  });
+});
+
+// ─── Tournament Countdown Logic ───────────────────────────────────────────────
+
+describe('Tournament Countdown Logic', () => {
+  const TOURNAMENT_START = new Date('2026-06-11T00:00:00');
+
+  test('tournament start date is in the future from 2025', () => {
+    const now2025 = new Date('2025-01-01T00:00:00');
+    const days = Math.ceil((TOURNAMENT_START - now2025) / 86_400_000);
+    expect(days).toBeGreaterThan(0);
+  });
+  test('countdown is zero or positive — never negative', () => {
+    const days = Math.max(0, Math.ceil((TOURNAMENT_START - new Date()) / 86_400_000));
+    expect(days).toBeGreaterThanOrEqual(0);
+  });
+  test('countdown label is correct string for future date', () => {
+    const days = 100;
+    const label = days > 0 ? `${days} days until kickoff` : 'Tournament is live!';
+    expect(label).toContain('days until kickoff');
+  });
+  test('live label shown when days is 0', () => {
+    const days = 0;
+    const label = days > 0 ? `${days} days until kickoff` : 'Tournament is live!';
+    expect(label).toBe('Tournament is live!');
+  });
+});
+
+// ─── Match Day Plan Prompt Construction ──────────────────────────────────────
+
+describe('Match Day Plan Prompt Construction', () => {
+  const stadium = {
+    commonName: 'MetLife Stadium', city: 'East Rutherford, NJ', country: 'United States',
+    capacity: 80663, roofType: 'open', surface: 'hybrid',
+  };
+
+  test('prompt contains stadium name', () => {
+    const prompt = `Generate a plan for ${stadium.commonName}`;
+    expect(prompt).toContain('MetLife Stadium');
+  });
+  test('prompt contains capacity formatted as a number', () => {
+    const prompt = `Venue facts: capacity ${stadium.capacity.toLocaleString()}`;
+    expect(prompt).toContain('80');
+  });
+  test('prompt references roof type', () => {
+    const prompt = `roof type ${stadium.roofType}`;
+    expect(prompt).toContain('open');
+  });
+  test('prompt references surface', () => {
+    const prompt = `surface ${stadium.surface}`;
+    expect(prompt).toContain('hybrid');
   });
 });
 

@@ -50,6 +50,14 @@ function applySecurityHeaders(res) {
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
+  res.setHeader('Content-Security-Policy',
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://apis.google.com; " +
+    "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; " +
+    "font-src https://fonts.gstatic.com; " +
+    "connect-src 'self' https://api.groq.com https://*.googleapis.com https://*.firebaseio.com https://www.gstatic.com; " +
+    "img-src 'self' data: https://*.googleusercontent.com;");
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -126,6 +134,12 @@ function validateMessages(messages) {
  * @returns {Promise<void>}
  */
 async function handleChatAPI(req, res) {
+  const contentType = req.headers['content-type'] || '';
+  if (!contentType.includes('application/json')) {
+    respondJSON(res, 415, { error: 'Content-Type must be application/json' });
+    return;
+  }
+
   const body = await readRequestBody(req);
 
   let parsed;
@@ -179,6 +193,7 @@ async function handleChatAPI(req, res) {
       return;
     }
 
+    res.setHeader('Cache-Control', 'no-store');
     respondJSON(res, 200, { reply });
   } catch (err) {
     console.error('[Groq Fetch Error]', err.message);
@@ -265,6 +280,12 @@ const server = http.createServer(async (req, res) => {
   const ip = req.socket.remoteAddress || 'unknown';
   if (req.url.startsWith('/api/') && !checkRateLimit(ip)) {
     respondJSON(res, 429, { error: 'Too many requests. Please slow down.' });
+    return;
+  }
+
+  if (req.url === '/.well-known/security.txt') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end(fs.readFileSync('.well-known/security.txt'));
     return;
   }
 

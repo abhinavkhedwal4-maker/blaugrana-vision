@@ -8,6 +8,7 @@
 
 'use strict';
 
+import { logError } from './errors.js';
 import { STADIUMS } from './stadiums-data.js';
 import {
   computeZoneRisk, classifyRiskLevel, estimateGateWaitMinutes,
@@ -236,7 +237,7 @@ window.requestAIRecommendation = async function requestAIRecommendation() {
   if (!panel || !content) return;
 
   panel.classList.remove('hidden');
-  content.innerHTML = '<p style="color:var(--text-muted)">Analysing conditions...</p>';
+  content.innerHTML = '<p class="text-muted">Analysing conditions...</p>';
 
   const prompt = `Zone: ${zone.label}
 Simulated occupants: ${simOccupants}
@@ -266,8 +267,8 @@ As a stadium operations advisor, give 3 short, specific, actionable recommendati
 
     content.innerHTML = formatMessage(reply);
   } catch (err) {
-    console.error('[Crowd Ops] AI recommendation error:', err.message);
-    content.innerHTML = '<p style="color:var(--text-muted)">⚠️ Could not reach Blaugrana AI. Make sure the server is running.</p>';
+    logError('Crowd Ops', 'AI recommendation', err);
+    content.innerHTML = '<p class="text-muted">⚠️ Could not reach Blaugrana AI. Make sure the server is running.</p>';
   }
 };
 

@@ -8,7 +8,9 @@
 
 'use strict';
 
+import { logError } from './errors.js';
 import { STADIUMS, getStadiumById } from './stadiums-data.js';
+import { renderStadiumDropdown } from './shared.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -50,15 +52,8 @@ let currentLang = 'en';
 
 /** Populates the stadium dropdown with all 16 venues. */
 function renderStadiumSelect() {
-  const select = document.getElementById('stadiumSelect');
-  if (!select) return;
-
-  select.innerHTML = STADIUMS.map((s) =>
-    `<option value="${s.id}" ${s.id === currentStadiumId ? 'selected' : ''}>${s.commonName} — ${s.city}</option>`,
-  ).join('');
-
-  select.addEventListener('change', (e) => {
-    currentStadiumId = e.target.value;
+  renderStadiumDropdown('stadiumSelect', (value) => {
+    currentStadiumId = value;
     renderPOIGrid();
   });
 }
@@ -77,6 +72,7 @@ function renderLanguagePills() {
   row.querySelectorAll('.lang-pill').forEach((btn) => {
     btn.addEventListener('click', () => {
       currentLang = btn.dataset.lang;
+      window.blaugranaLang = currentLang;
       renderLanguagePills();
       const hint = document.getElementById('langHint');
       if (hint) {
@@ -136,13 +132,13 @@ function generateRoute(poiId, stadium) {
 
   resultEl.classList.remove('hidden');
   resultEl.innerHTML = `
-    <h3 style="margin-bottom:1rem;">Route to ${poi.name}</h3>
+    <h3 class="route-result-title">Route to ${poi.name}</h3>
     ${steps.map((step, i) => `
       <div class="route-step">
         <span class="route-step-num">${i + 1}</span>
         <span class="route-step-text">${step}</span>
       </div>`).join('')}
-    <p style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted)">
+    <p class="route-result-venue-note">
       📍 At ${stadium.commonName} — ask Blaugrana AI for turn-by-turn help anytime.
     </p>`;
 
@@ -166,6 +162,56 @@ function wireSearchBox() {
   button?.addEventListener('click', submit);
   input?.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
 }
+
+// ─── AI Match Day Planner ─────────────────────────────────────────────────────
+
+/**
+ * Generates a personalized, AI-synthesized match-day itinerary combining
+ * the selected stadium's real data, kickoff timing, and any selected
+ * accessibility needs into one structured plan. Demonstrates generative
+ * synthesis rather than simple retrieval Q&A.
+ * @returns {Promise<void>}
+ */
+window.generateMatchPlan = async function generateMatchPlan() {
+  const stadium = getStadiumById(currentStadiumId);
+  const resultEl = document.getElementById('planResult');
+  const btn = document.getElementById('planBtn');
+  if (!resultEl || !stadium) return;
+
+  btn.disabled = true;
+  resultEl.classList.remove('hidden');
+  resultEl.innerHTML = '<p style="color:var(--text-muted)">Building your plan\u2026</p>';
+
+  const langLabel = LANGUAGES.find((l) => l.code === currentLang)?.label || 'English';
+  const prompt = `Generate a personalized match-day plan for a fan attending \
+a match at ${stadium.commonName} (${stadium.city}, ${stadium.country}). \
+Venue facts: capacity ${stadium.capacity.toLocaleString()}, roof type ${stadium.roofType}, \
+surface ${stadium.surface}. Language preference: ${langLabel}. \
+Structure the plan as 5 numbered steps covering: recommended arrival time before kickoff, \
+best transport mode given the venue, entrance guidance, one amenity stop suggestion, \
+and one venue-specific tip. One sentence per step. Respond in ${langLabel}.`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [
+          { role: 'system', content: 'You are Blaugrana AI, generating personalized match-day plans for FIFA World Cup 2026 fans.' },
+          { role: 'user', content: prompt },
+        ],
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { reply } = await res.json();
+    resultEl.innerHTML = `<h3 style="margin-bottom:0.75rem">Your Plan for ${stadium.commonName}</h3>${reply.replace(/\n/g, '<br>')}`;
+  } catch (err) {
+    logError('Navigator', 'generateMatchPlan', err);
+    resultEl.innerHTML = '<p style="color:var(--text-muted)">\u26a0\ufe0f Could not generate plan. Try again shortly.</p>';
+  } finally {
+    btn.disabled = false;
+  }
+};
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 

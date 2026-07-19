@@ -51,7 +51,7 @@
 
   <div class="page-hero" id="main-content">
     <div class="section-label">For Venue Staff & Organisers</div>
-    <h1>Crowd <span style="color:var(--gold)">Operations</span></h1>
+    <h1>Crowd <span class="hero-accent">Operations</span></h1>
     <p>Live density, gate congestion and evacuation-time intelligence — grounded in Fruin Level-of-Service and NFPA 101 safety standards.</p>
   </div>
 
@@ -62,7 +62,7 @@
 
     <div class="zone-detail-grid">
       <div class="risk-panel" role="region" aria-labelledby="riskPanelTitle">
-        <h2 id="riskPanelTitle" style="margin-bottom:1rem;">Zone Risk Assessment</h2>
+        <h2 id="riskPanelTitle" class="section-heading">Zone Risk Assessment</h2>
         <div class="risk-score-ring-wrap">
           <div>
             <div class="risk-score-num" id="riskScoreNum" aria-live="polite">0</div>
@@ -73,8 +73,8 @@
       </div>
 
       <div class="controls-panel" role="region" aria-labelledby="controlsPanelTitle">
-        <h2 id="controlsPanelTitle" style="margin-bottom:0.5rem;">Simulate Conditions</h2>
-        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">Adjust to model different crowd scenarios for this zone.</p>
+        <h2 id="controlsPanelTitle" class="section-heading-sm">Simulate Conditions</h2>
+        <p class="section-hint">Adjust to model different crowd scenarios for this zone.</p>
 
         <div class="slider-group">
           <label for="occupantsSlider">Occupants: <span class="slider-value" id="occupantsValue">8,000</span></label>
@@ -85,13 +85,13 @@
           <input type="range" id="arrivalsSlider" min="0" max="400" step="10" value="120" aria-label="Arrivals per minute"/>
         </div>
 
-        <button class="btn btn-primary" type="button" onclick="requestAIRecommendation()" style="margin-top:0.5rem;" aria-label="Get AI recommendation">
-          🤖 Get AI Recommendation
+        <button class="btn btn-primary btn-top-gap" type="button" onclick="requestAIRecommendation()" aria-label="Get real-time decision support">
+          🤖 Get Real-Time Decision Support
         </button>
       </div>
     </div>
 
-    <h2 style="margin-bottom:1rem;">Gate Status</h2>
+    <h2 class="section-heading">Gate Status</h2>
     <div class="gate-list" id="gateList" role="list" aria-label="Gate congestion status"></div>
 
     <div class="ai-recommendation hidden" id="aiRecommendation" aria-live="polite">
@@ -99,6 +99,13 @@
       <div id="aiRecommendationContent"></div>
     </div>
   </div>
+
+  <footer class="page-footer-note">
+    <p>GenAI-enabled navigation, crowd management, accessibility, transportation,
+    sustainability, multilingual assistance, operational intelligence and
+    real-time decision support — for fans, organizers, volunteers and venue
+    staff at FIFA World Cup 2026.</p>
+  </footer>
 
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat">

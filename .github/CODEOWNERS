@@ -1,0 +1,14 @@
+# CODEOWNERS
+# Each line is a file pattern and the owner(s) responsible for review.
+
+# Default owner for everything
+* @your-username
+
+# Pure calculation modules — require extra scrutiny
+js/crowd-model.js  @your-username
+js/carbon.js       @your-username
+
+# Security-sensitive files
+server.js          @your-username
+api/chat.js        @your-username
+SECURITY.md        @your-username
