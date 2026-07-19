@@ -171,12 +171,19 @@ export const STADIUMS = Object.freeze([
 ]);
 
 /**
- * Looks up a stadium by its URL-safe id.
+ * Pre-built O(1) lookup map: id → Stadium object.
+ * Populated once at module-load time from the frozen STADIUMS array.
+ * @type {Map<string, Stadium>}
+ */
+const STADIUM_BY_ID = new Map(STADIUMS.map((s) => [s.id, s]));
+
+/**
+ * Looks up a stadium by its URL-safe id in O(1) time.
  * @param {string} id - Stadium slug (e.g. 'mexico-city')
  * @returns {Stadium|undefined}
  */
 export function getStadiumById(id) {
-  return STADIUMS.find((s) => s.id === id);
+  return STADIUM_BY_ID.get(id);
 }
 
 /**

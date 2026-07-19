@@ -7,9 +7,43 @@
  * @module shared
  */
 
-'use strict';
-
 import { STADIUMS } from './stadiums-data.js';
+
+// ─── Prompt Injection Prevention ─────────────────────────────────────────────
+
+/** Patterns indicating an attempt to override the AI system instructions */
+const INJECTION_PATTERNS = Object.freeze([
+  /ignore (all |previous |prior )?instructions/i,
+  /disregard (all |previous |your )?(prompts|instructions)/i,
+  /new instructions\s*:/i,
+  /system\s*:/i,
+  /you are now/i,
+  /\[INST\]|<\|im_start\|>/i,
+  /act as (a |an )?(different|new|unrestricted|jailbreak)/i,
+  /pretend (you are|to be)/i,
+  /forget (all |your |previous )?instructions/i,
+  /override (your )?(system|safety|guidelines)/i,
+  /developer mode/i,
+  /jailbreak/i,
+]);
+
+/**
+ * Detects and neutralizes common prompt-injection patterns in user input
+ * before it reaches the AI system prompt. Applied client-side as the first
+ * sanitization step; the same logic runs server-side in api/chat.js for
+ * defense in depth.
+ *
+ * @param {string} text - Raw user message
+ * @returns {string} Text with injection patterns replaced by [filtered]
+ */
+export function sanitizePromptInjection(text) {
+  if (typeof text !== 'string') return '';
+  let result = text;
+  INJECTION_PATTERNS.forEach((pattern) => {
+    result = result.replace(pattern, '[filtered]');
+  });
+  return result;
+}
 
 /**
  * Represents a single message in an AI conversation.
@@ -51,6 +85,7 @@ export function sanitizeString(str, maxLength = DEFAULT_MAX_LENGTH) {
 /**
  * Formats AI-generated message text with markdown-lite rendering.
  * Supports bold, italic, inline code, and paragraph breaks.
+ * Bold/italic content is sanitized before wrapping to prevent XSS.
  *
  * @param {string} text - Raw message text
  * @returns {string} HTML-formatted string, safe for innerHTML
@@ -58,8 +93,8 @@ export function sanitizeString(str, maxLength = DEFAULT_MAX_LENGTH) {
 export function formatMessage(text) {
   if (typeof text !== 'string') return '';
   return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\*\*(.*?)\*\*/g, (_, inner) => `<strong>${sanitizeString(inner)}</strong>`)
+    .replace(/\*(.*?)\*/g, (_, inner) => `<em>${sanitizeString(inner)}</em>`)
     .replace(/`(.*?)`/g, (_, code) =>
       `<code style="background:rgba(0,102,204,0.15);padding:0.1em 0.4em;border-radius:4px;font-family:monospace;">${sanitizeString(code)}</code>`)
     .replace(/\n\n/g, '</p><p>')

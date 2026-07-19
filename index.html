@@ -26,7 +26,7 @@
       <span class="logo-text">Blaugrana Vision</span>
     </a>
     <ul class="nav-links" role="menubar">
-      <li role="none"><a href="index.html" class="active" role="menuitem">Home</a></li>
+      <li role="none"><a href="index.html" class="active" aria-current="page" role="menuitem">Home</a></li>
       <li role="none"><a href="pages/stadium-explorer.html" role="menuitem">3D Stadiums</a></li>
       <li role="none"><a href="pages/navigator.html" role="menuitem">Navigator</a></li>
       <li role="none"><a href="pages/crowd-ops.html" role="menuitem">Crowd Ops</a></li>
@@ -48,7 +48,8 @@
     </div>
   </nav>
 
-  <section class="hero" id="main-content" aria-labelledby="heroTitle">
+  <main id="main-content">
+  <section class="hero" aria-labelledby="heroTitle">
     <div class="hero-badge" role="status">🌍 GenAI-Powered Tournament Operations</div>
     <h1 class="hero-title" id="heroTitle">
       <span class="title-line">Every Stadium.</span>
@@ -126,6 +127,7 @@
       <!-- Populated by main.js from stadiums-data.js -->
     </div>
   </section>
+  </main>
 
   <div class="chatbot-overlay" id="chatOverlay" onclick="toggleChat()" aria-hidden="true"></div>
   <div class="chatbot-panel" id="chatPanel" role="dialog" aria-modal="true" aria-label="Blaugrana AI Chat Assistant">

@@ -34,7 +34,7 @@
       <li role="none"><a href="transport.html" role="menuitem">Transport</a></li>
       <li role="none"><a href="accessibility.html" role="menuitem">Accessibility</a></li>
       <li role="none"><a href="sustainability.html" role="menuitem">Sustainability</a></li>
-      <li role="none"><a href="operations.html" class="active" role="menuitem">Operations</a></li>
+      <li role="none"><a href="operations.html" class="active" aria-current="page" role="menuitem">Operations</a></li>
     </ul>
     <div class="nav-right">
       <button class="chat-toggle-btn" type="button" onclick="toggleChat()" aria-label="Open AI assistant" aria-expanded="false" id="chatToggleBtn">
@@ -49,7 +49,8 @@
     </div>
   </nav>
 
-  <div class="page-hero" id="main-content">
+  <main id="main-content">
+  <div class="page-hero">
     <div class="section-label">For Organisers & Volunteers</div>
     <h1>Operations <span class="hero-accent">Command Centre</span></h1>
     <p>Unified real-time intelligence across all 16 venues — status, incidents, and AI-generated briefings in one place.</p>
@@ -72,14 +73,17 @@
 
       <div class="incident-panel">
         <h2 class="section-heading">Log an Incident</h2>
-        <form class="incident-form" id="incidentForm" aria-label="Incident logging form">
+        <form class="incident-form" id="incidentForm" aria-label="Incident logging form" novalidate>
           <div class="form-group">
             <label for="incidentStadium">Venue</label>
-            <select id="incidentStadium" required></select>
+            <select id="incidentStadium" required autocomplete="off" aria-required="true"></select>
           </div>
           <div class="form-group">
             <label for="incidentDetails">Details</label>
-            <textarea id="incidentDetails" required maxlength="300" placeholder="e.g. Gate C queue exceeding 15 min wait"></textarea>
+            <textarea id="incidentDetails" required maxlength="300"
+              placeholder="e.g. Gate C queue exceeding 15 min wait"
+              aria-required="true" aria-describedby="incidentDetailsHint"></textarea>
+            <span id="incidentDetailsHint" class="sr-only">Required. Maximum 300 characters.</span>
           </div>
           <button type="submit" class="btn btn-primary btn-full-width">Log Incident</button>
         </form>
@@ -93,6 +97,7 @@
       <div id="briefingContent"><p class="text-muted">Click "Generate Briefing" for an AI-authored summary of current tournament-wide status.</p></div>
     </div>
   </div>
+  </main>
 
   <footer class="page-footer-note">
     <p>GenAI-enabled navigation, crowd management, accessibility, transportation,

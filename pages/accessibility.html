@@ -32,7 +32,7 @@
       <li role="none"><a href="navigator.html" role="menuitem">Navigator</a></li>
       <li role="none"><a href="crowd-ops.html" role="menuitem">Crowd Ops</a></li>
       <li role="none"><a href="transport.html" role="menuitem">Transport</a></li>
-      <li role="none"><a href="accessibility.html" class="active" role="menuitem">Accessibility</a></li>
+      <li role="none"><a href="accessibility.html" class="active" aria-current="page" role="menuitem">Accessibility</a></li>
       <li role="none"><a href="sustainability.html" role="menuitem">Sustainability</a></li>
       <li role="none"><a href="operations.html" role="menuitem">Operations</a></li>
     </ul>
@@ -49,7 +49,8 @@
     </div>
   </nav>
 
-  <div class="page-hero" id="main-content">
+  <main id="main-content">
+  <div class="page-hero">
     <div class="section-label">For Every Fan</div>
     <h1>Accessibility <span class="hero-accent">Services</span></h1>
     <p>Wheelchair routing, sensory-friendly zones, and one-tap assistance requests — designed for every fan to enjoy the tournament comfortably.</p>
@@ -64,22 +65,25 @@
     <div class="amenity-list amenity-list--spaced" id="amenityList" role="list" aria-label="Accessible amenities"></div>
 
     <h2 class="section-heading">Request Assistance</h2>
-    <form class="assist-form" id="assistForm" aria-label="Assistance request form">
+    <form class="assist-form" id="assistForm" aria-label="Assistance request form" novalidate>
       <div class="form-group">
         <label for="assistStadium">Stadium</label>
-        <select id="assistStadium" required></select>
+        <select id="assistStadium" required autocomplete="off" aria-required="true"></select>
       </div>
       <div class="form-group">
         <label for="assistDetails">Additional details (optional)</label>
-        <textarea id="assistDetails" placeholder="e.g. Arriving via Gate C at 6:30 PM, travelling with a companion" maxlength="500"></textarea>
+        <textarea id="assistDetails" placeholder="e.g. Arriving via Gate C at 6:30 PM, travelling with a companion"
+          maxlength="500" aria-describedby="assistDetailsHint"></textarea>
+        <span id="assistDetailsHint" class="sr-only">Optional. Maximum 500 characters.</span>
       </div>
       <button type="submit" class="btn btn-primary" aria-label="Submit assistance request">Submit Request</button>
     </form>
 
     <div class="confirmation-toast hidden" id="confirmationToast" aria-live="polite"></div>
     </div>
-  
-    <footer class="page-footer-note">
+  </main>
+
+  <footer class="page-footer-note">
       <p>GenAI-enabled navigation, crowd management, accessibility, transportation,
       sustainability, multilingual assistance, operational intelligence and
       real-time decision support — for fans, organizers, volunteers and venue

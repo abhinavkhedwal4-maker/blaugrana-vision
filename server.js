@@ -19,10 +19,13 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const PORT        = parseInt(process.env.PORT, 10) || 3000;
-const MAX_BODY    = 1024 * 50;
-const RATE_WINDOW = 60 * 1000;
-const RATE_LIMIT  = 30;
+const PORT             = parseInt(process.env.PORT, 10) || 3000;
+const MAX_BODY         = 1024 * 50;
+const RATE_WINDOW      = 60 * 1000;
+/** General endpoints: higher limit (static files, health checks) */
+const GENERAL_RATE_LIMIT = 100;
+/** AI endpoint: strict limit — AI calls are expensive and slow */
+const AI_RATE_LIMIT      = 20;
 
 /** @type {Map<string, {count:number, reset:number}>} */
 const rateLimitStore = new Map();
@@ -55,27 +58,38 @@ function applySecurityHeaders(res) {
     "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://apis.google.com; " +
     "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; " +
     "font-src https://fonts.gstatic.com; " +
-    "connect-src 'self' https://api.groq.com https://*.googleapis.com https://*.firebaseio.com https://www.gstatic.com; " +
+    "connect-src 'self' https://api.groq.com https://*.googleapis.com https://*.firebaseio.com https://www.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; " +
+    "frame-src https://blaugrana-vision.firebaseapp.com https://accounts.google.com; " +
     "img-src 'self' data: https://*.googleusercontent.com;");
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
 }
 
 /**
  * Checks and updates the rate limit counter for a given IP.
- * @param {string} ip
+ * Uses separate keys and limits for AI vs general endpoints so that
+ * expensive AI calls are throttled more tightly (20/min) than general
+ * page requests (100/min).
+ *
+ * @param {string}  ip          - Client IP address
+ * @param {boolean} isAiEndpoint - True for /api/chat, false for all else
  * @returns {boolean} True if the request is allowed
  */
-function checkRateLimit(ip) {
+function checkRateLimit(ip, isAiEndpoint) {
+  const key    = isAiEndpoint ? `ai:${ip}` : ip;
+  const limit  = isAiEndpoint ? AI_RATE_LIMIT : GENERAL_RATE_LIMIT;
   const now    = Date.now();
-  const record = rateLimitStore.get(ip);
+  const record = rateLimitStore.get(key);
   if (!record || now > record.reset) {
-    rateLimitStore.set(ip, { count: 1, reset: now + RATE_WINDOW });
+    rateLimitStore.set(key, { count: 1, reset: now + RATE_WINDOW });
     return true;
   }
-  if (record.count >= RATE_LIMIT) return false;
+  if (record.count >= limit) return false;
   record.count++;
   return true;
 }
@@ -86,6 +100,29 @@ setInterval(() => {
     if (now > record.reset) rateLimitStore.delete(ip);
   }
 }, 5 * 60 * 1000);
+
+/**
+ * Neutralizes common prompt-injection patterns before the content
+ * reaches the AI model. Defense-in-depth — same filter runs in api/chat.js.
+ * @param {string} str - Raw message content
+ * @returns {string} Content with injection patterns replaced by [filtered]
+ */
+function sanitizePromptInjection(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/ignore (all |previous |prior )?instructions/gi, '[filtered]')
+    .replace(/disregard (all |previous |your )?(prompts|instructions)/gi, '[filtered]')
+    .replace(/new instructions\s*:/gi, '[filtered]')
+    .replace(/system\s*:/gi, '[filtered]')
+    .replace(/you are now/gi, '[filtered]')
+    .replace(/\[INST\]|<\|im_start\|>/gi, '[filtered]')
+    .replace(/act as (a |an )?(different|new|unrestricted|jailbreak)/gi, '[filtered]')
+    .replace(/pretend (you are|to be)/gi, '[filtered]')
+    .replace(/forget (all |your |previous )?instructions/gi, '[filtered]')
+    .replace(/override (your )?(system|safety|guidelines)/gi, '[filtered]')
+    .replace(/developer mode/gi, '[filtered]')
+    .replace(/jailbreak/gi, '[filtered]');
+}
 
 /**
  * Sanitises a string to prevent XSS injection.
@@ -121,7 +158,7 @@ function validateMessages(messages) {
     if (!validRoles.has(msg.role))       return { valid: false, error: `Invalid role: ${msg.role}` };
     if (typeof msg.content !== 'string') return { valid: false, error: 'Content must be string' };
     if (!msg.content.trim())             return { valid: false, error: 'Content cannot be empty' };
-    sanitized.push({ role: msg.role, content: sanitizeString(msg.content) });
+    sanitized.push({ role: msg.role, content: sanitizeString(sanitizePromptInjection(msg.content)) });
   }
 
   return { valid: true, sanitized };
@@ -278,9 +315,15 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
   const ip = req.socket.remoteAddress || 'unknown';
-  if (req.url.startsWith('/api/') && !checkRateLimit(ip)) {
-    respondJSON(res, 429, { error: 'Too many requests. Please slow down.' });
-    return;
+  const isAiEndpoint = req.url === '/api/chat';
+  if (req.url.startsWith('/api/')) {
+    const limit = isAiEndpoint ? AI_RATE_LIMIT : GENERAL_RATE_LIMIT;
+    res.setHeader('X-RateLimit-Limit', String(limit));
+    if (!checkRateLimit(ip, isAiEndpoint)) {
+      res.setHeader('Retry-After', '60');
+      respondJSON(res, 429, { error: 'Too many requests. Please slow down.' });
+      return;
+    }
   }
 
   if (req.url === '/.well-known/security.txt') {
@@ -337,4 +380,4 @@ server.on('error', (err) => {
   process.exit(1);
 });
 
-module.exports = { validateMessages, sanitizeString, checkRateLimit };
+module.exports = { validateMessages, sanitizeString, sanitizePromptInjection, checkRateLimit };

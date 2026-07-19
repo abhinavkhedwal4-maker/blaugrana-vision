@@ -9,7 +9,7 @@
 'use strict';
 
 import { logError } from './errors.js';
-import { sanitizeString, formatMessage } from './shared.js';
+import { sanitizeString, formatMessage, sanitizePromptInjection } from './shared.js';
 
 const ENDPOINT       = '/api/chat';
 const MAX_MSG_LENGTH = 500;
@@ -48,6 +48,9 @@ const messageTimes = [];
 
 /** @type {boolean} */
 let isProcessing = false;
+
+/** @type {AbortController|null} — cancels any in-flight AI request */
+let activeController = null;
 
 /**
  * Checks the client-side rate limit.
@@ -100,6 +103,13 @@ function appendMessage(role, text) {
     p.textContent = text;
     content.appendChild(p);
   } else {
+    // WCAG 3.1.2 — mark AI response with the correct language and direction
+    const langAttr = window.blaugranaLang && window.blaugranaLang !== 'en'
+      ? window.blaugranaLang
+      : 'en';
+    const dirAttr = langAttr === 'ar' ? 'rtl' : 'ltr';
+    content.setAttribute('lang', langAttr);
+    content.setAttribute('dir', dirAttr);
     content.innerHTML = formatMessage(text);
   }
 
@@ -192,7 +202,7 @@ async function sendMessage() {
     return;
   }
 
-  const message = sanitizeString(rawText, MAX_MSG_LENGTH);
+  const message = sanitizeString(sanitizePromptInjection(rawText), MAX_MSG_LENGTH);
   isProcessing  = true;
 
   appendMessage('user', rawText.trim());
@@ -203,6 +213,10 @@ async function sendMessage() {
   conversationHistory.push({ role: 'user', content: message });
   const typingId = showTyping();
 
+  // Cancel any prior request that was still in flight
+  activeController?.abort();
+  activeController = new AbortController();
+
   try {
     const langNote = window.blaugranaLang && window.blaugranaLang !== 'en'
       ? ` Respond in ${LANGUAGE_NAMES[window.blaugranaLang]} unless the user writes in English.`
@@ -211,6 +225,7 @@ async function sendMessage() {
     const response = await fetch(ENDPOINT, {
       method : 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal : activeController.signal,
       body   : JSON.stringify({
         messages: [
           { role: 'system', content: `${SYSTEM_PROMPT}${langNote}` },

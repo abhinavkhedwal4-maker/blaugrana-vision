@@ -12,6 +12,30 @@ const MAX_MESSAGES = 50;
 const MAX_CONTENT  = 2000;
 
 /**
+ * Neutralizes common prompt-injection patterns before the content
+ * reaches the AI model. Defense-in-depth layer — the same filter
+ * also runs client-side in js/shared.js.
+ * @param {string} str - Raw message content
+ * @returns {string} Content with injection patterns replaced by [filtered]
+ */
+function sanitizePromptInjection(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/ignore (all |previous |prior )?instructions/gi, '[filtered]')
+    .replace(/disregard (all |previous |your )?(prompts|instructions)/gi, '[filtered]')
+    .replace(/new instructions\s*:/gi, '[filtered]')
+    .replace(/system\s*:/gi, '[filtered]')
+    .replace(/you are now/gi, '[filtered]')
+    .replace(/\[INST\]|<\|im_start\|>/gi, '[filtered]')
+    .replace(/act as (a |an )?(different|new|unrestricted|jailbreak)/gi, '[filtered]')
+    .replace(/pretend (you are|to be)/gi, '[filtered]')
+    .replace(/forget (all |your |previous )?instructions/gi, '[filtered]')
+    .replace(/override (your )?(system|safety|guidelines)/gi, '[filtered]')
+    .replace(/developer mode/gi, '[filtered]')
+    .replace(/jailbreak/gi, '[filtered]');
+}
+
+/**
  * Sanitises a string to prevent XSS injection.
  * @param {string} str
  * @returns {string}
@@ -45,7 +69,7 @@ function validateMessages(messages) {
     if (!validRoles.has(msg.role))       return { valid: false, error: `invalid role: ${msg.role}` };
     if (typeof msg.content !== 'string') return { valid: false, error: 'content must be string' };
     if (!msg.content.trim())             return { valid: false, error: 'content cannot be empty' };
-    sanitized.push({ role: msg.role, content: sanitizeString(msg.content) });
+    sanitized.push({ role: msg.role, content: sanitizeString(sanitizePromptInjection(msg.content)) });
   }
 
   return { valid: true, sanitized };
@@ -68,12 +92,16 @@ export default async function handler(req, res) {
     "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com https://apis.google.com; " +
     "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; " +
     "font-src https://fonts.gstatic.com; " +
-    "connect-src 'self' https://api.groq.com https://*.googleapis.com https://*.firebaseio.com https://www.gstatic.com; " +
+    "connect-src 'self' https://api.groq.com https://*.googleapis.com https://*.firebaseio.com https://www.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; " +
+    "frame-src https://blaugrana-vision.firebaseapp.com https://accounts.google.com; " +
     "img-src 'self' data: https://*.googleusercontent.com;");
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
 
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
   if (req.method !== 'POST')    { res.status(405).json({ error: 'Method not allowed' }); return; }

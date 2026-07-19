@@ -150,6 +150,10 @@ function renderRiskPanel() {
 
   if (scoreEl) scoreEl.textContent = String(risk.score);
   if (badgeEl) {
+    // WCAG — role="status" + aria-live="polite" ensures screen readers announce
+    // safety-critical risk level changes dynamically (not just on page load).
+    badgeEl.setAttribute('role', 'status');
+    badgeEl.setAttribute('aria-live', 'polite');
     badgeEl.textContent = level.charAt(0).toUpperCase() + level.slice(1);
     badgeEl.className = `risk-level-badge ${level}`;
   }
